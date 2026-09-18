@@ -1,0 +1,25 @@
+{
+  "name": "wedding-starfall-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Video Sao Rơi 2K/4K Chiếu Màn Hình LED Tiệc Cưới - Remotion",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render StarFall2K out/sao-roi-2k.mp4 --concurrency=100% --gl=angle",
+    "render:2k": "remotion render StarFall2K out/sao-roi-2k.mp4 --concurrency=100% --crf=18 --gl=angle",
+    "render:4k": "remotion render StarFall4K out/sao-roi-4k.mp4 --concurrency=100% --crf=18 --gl=angle"
+  },
+  "dependencies": {
+    "@remotion/effects": "^4.0.218",
+    "@remotion/google-fonts": "^4.0.218",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.218"
+  },
+  "devDependencies": {
+    "@remotion/cli": "^4.0.218",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.6.3"
+  }
+}
