@@ -115,10 +115,15 @@ Từ việc audit mã nguồn dự án trước của bạn tại `/Users/phammi
 
 ---
 
-## 5. KẾT LUẬN & TRẠNG THÁI HIỆN TẠI
+## 5. ĐÁNH GIÁ THỰC NGHIỆM REMOTION & LỘ TRÌNH NGHIỆM THU TỪNG PHÂN VÙNG
 
-Báo cáo phân tích bóc tách đã hoàn tất 100% việc mổ xẻ toàn diện clip mẫu từ mỹ thuật, bố cục layer đến thuật toán chuyển động.  
-File này được lưu trữ trực tiếp tại:
-👉 `audit-sao-roi.md` (ngay thư mục gốc dự án).
+Sau khi kiểm thử thực tế bản sườn Scaffold trên Remotion Studio, khoảng cách lớn nhất so với video gốc nằm ở **mật độ và hiệu ứng cộng sáng của hạt sao**. Thẻ HTML `<div>` không đủ khả năng tái tạo hàng ngàn hạt bụi kim cương phát quang như Trapcode Particular trong clip mẫu.
 
-Mọi cơ sở kỹ thuật đã sẵn sàng để bước sang giai đoạn tiếp theo theo chỉ đạo của bạn!
+Chi tiết bản phân tích đối chiếu từng pixel và giải pháp kỹ thuật đã được tổng hợp riêng tại:
+👉 [**`docs/audit-so-sanh-va-giai-phap.md`**](file:///Users/phamminhtri/Desktop/project/wedding/project-video-sao-roi/docs/audit-so-sanh-va-giai-phap.md)
+
+### Thứ tự ưu tiên thực thi & nghiệm thu cuốn chiếu:
+1. **Giai đoạn 1 (Ưu tiên hàng đầu)**: Nâng cấp **Top Layer (Star Canopy)** và **Bottom Layer (Stage Floor)** sang Engine Canvas 2D với hiệu ứng Additive Blending (`lighter`). Kiểm thử và nghiệm thu.
+2. **Giai đoạn 2**: Tinh chỉnh **Falling Stars (Mưa sao rơi)** thanh mảnh, bồng bềnh.
+3. **Giai đoạn 3**: Vẽ lại chuẩn xác 100% **Logo Monogram H T** (SVG vector nghệ thuật), chuẩn hóa font chữ Dâu Rể và định dạng ngày cưới `27/9/2026`.
+4. **Giai đoạn 4**: Tinh chỉnh **Phông rèm nhung & Cột sáng rọi sân khấu (Volumetric God Rays)**. Nghiệm thu toàn diện.
