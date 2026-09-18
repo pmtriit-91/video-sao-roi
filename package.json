@@ -12,9 +12,11 @@
   "dependencies": {
     "@remotion/effects": "^4.0.218",
     "@remotion/google-fonts": "^4.0.218",
+    "@types/three": "^0.186.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "remotion": "^4.0.218"
+    "remotion": "^4.0.218",
+    "three": "^0.186.0"
   },
   "devDependencies": {
     "@remotion/cli": "^4.0.218",

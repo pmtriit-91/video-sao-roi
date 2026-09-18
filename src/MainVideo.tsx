@@ -5,7 +5,7 @@ import { FallingStars } from "./components/FallingStars";
 import { FontLoader } from "./components/FontLoader";
 import { StageBackdrop } from "./components/StageBackdrop";
 import { StageFloor } from "./components/StageFloor";
-import { StarCanopy } from "./components/StarCanopy";
+import { StarCanopyThree as StarCanopy } from "./components/StarCanopyThree";
 import { getActivePalette, starConfig } from "./config/starConfig";
 import { WeddingStarConfig } from "./config/types";
 
