@@ -52,14 +52,18 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
 
   const loopAngle = (frame / loopDurationFrames) * Math.PI * 2;
 
-  // 1. Phối cảnh 3D vòm trần cong hình chữ U (Smiling Arch) chuẩn video gốc
+  // 1. Phối cảnh 3D Đĩa Trần Sao Ngang (Horizontal Perspective Ceiling Disc) chuẩn Clip Gốc Ảnh 3 & Sơ đồ Ảnh 1
   const { positions, randomData, colors } = useMemo(() => {
     const pos = new Float32Array(count * 3);
     const rnd = new Float32Array(count * 4); // [twinkleSpeed, phase, baseSize, driftAmp]
     const col = new Float32Array(count * 3);
 
-    // Bề rộng vòm bao trùm toàn bộ màn hình 2560px
-    const halfSpanX = 1450;
+    // Kích thước hình học đĩa trần 3D trên nóc sân khấu
+    const ceilingY = 490;      // Độ cao trần overhead
+    const thicknessY = 95;     // Độ dày thể tích lớp bụi sao
+    const centerZ = -190;      // Tâm đĩa lùi nhẹ vào hậu cảnh sân khấu
+    const radiusX = 1750;      // Bán kính ngang bao trùm rộng rãi
+    const radiusZ = 820;       // Bán kính sâu (mép trước Z=+630 tràn qua đầu camera, phủ kín đỉnh màn hình)
 
     for (let i = 0; i < count; i++) {
       // Hàm băm giả ngẫu nhiên xác định (deterministic PRNG)
@@ -67,67 +71,78 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
       const h2 = ((Math.sin(i * 93.9898 + 67.345) * 24634.6345) % 1 + 1) % 1;
       const h3 = ((Math.sin(i * 45.1232 + 19.876) * 58392.1234) % 1 + 1) % 1;
       const h4 = ((Math.sin(i * 73.4561 + 31.241) * 39182.8765) % 1 + 1) % 1;
+      const h5 = ((Math.sin(i * 37.8912 + 82.119) * 51829.4123) % 1 + 1) % 1;
 
-      // Trục hoành X: trải dài đều từ góc trái sang góc phải
-      const x = (h1 * 2.0 - 1.0) * halfSpanX;
-      const normX = Math.abs(x) / halfSpanX;
+      // Góc theta phân bố vòng quanh đĩa:
+      const theta = h1 * Math.PI * 2;
 
-      // Đường biên đáy vòm đỉnh U-Arch (Smiling Rim):
-      // Ở trung tâm (x = 0): đáy vòm hạ xuống y = 330 (cách đỉnh Logo khoảng 40px)
-      // Ở 2 bên biên (x = ±1450): uốn lượn cong vểnh lên y = 500
-      const archBottomY = 330 + Math.pow(normX, 1.6) * 170;
-      const skyTopY = 730; // Mép trên cùng của khung hình
-
-      // Phân bố hạt: Phủ kín từ mép trên xuống đến đường biên vòm,
-      // tập trung mật độ đậm đặc nhất ở viền đáy và trục giữa (hiệu ứng đèn rọi)
-      let y: number;
-      if (h2 < 0.60) {
-        // Nhóm 1 (60%): Lớp mây trần phủ đều từ viền đáy lên đỉnh trời,
-        // lũy thừa 1.7 giúp hạt dồn dày nhất ở viền phát sáng
-        y = archBottomY + Math.pow(h3, 1.7) * (skyTopY - archBottomY);
-      } else if (h2 < 0.88) {
-        // Nhóm 2 (28%): Dải lõi kim cương đậm đặc ngay sát viền đáy vòm tạo đường nét rõ ràng
-        y = archBottomY + (h3 - 0.5) * 80;
+      // Bán kính r: 50% hạt dồn vào cụm trung tâm và viền hậu cảnh (Cụm sáng chính)
+      let r: number;
+      if (h2 < 0.55) {
+        // Hạt tập trung trong vùng lõi phát quang
+        r = Math.pow(h3, 1.35) * 0.75;
       } else {
-        // Nhóm 3 (12%): Những hạt bụi sa xuống nhẹ nhàng mềm mại về phía logo
-        y = archBottomY - Math.pow(h3, 2.0) * 130;
+        // Hạt phân tán đều ra toàn bộ đĩa
+        r = Math.pow(h3, 0.95);
       }
 
-      // Trục sâu Z: tạo thể tích 3D dày dặn
-      const z = (h4 - 0.5) * 550;
+      const x = Math.cos(theta) * r * radiusX;
+      const z = centerZ + Math.sin(theta) * r * radiusZ;
+      const normX = Math.abs(x) / radiusX;
+
+      // Độ cao Y:
+      let y = ceilingY + (h4 - 0.5) * thicknessY;
+
+      // Ở viền sau (mép nhìn thấy của trần), tăng nhẹ độ dày và nở sáng
+      const isRearBorder = Math.sin(theta) < -0.3;
+      if (isRearBorder && normX < 0.45) {
+        y += (h5 - 0.5) * 35;
+      }
+
+      // 8% hạt bụi kim cương sa nhẹ xuống dưới trần
+      if (h3 > 0.92) {
+        y -= Math.pow(h5, 2.0) * 110;
+      }
 
       pos[i * 3 + 0] = x;
-      pos[i * 3 + 1] = y + (z / 550) * -20; // Độ nghiêng phối cảnh
+      pos[i * 3 + 1] = y;
       pos[i * 3 + 2] = z;
 
-      // Kích thước quang học chuẩn độ phân giải 2K/4K:
-      // (1 pixel trên 2K = ~1.0 unit với hệ số tỉ lệ 1350/-mvPosition.z)
-      // - 75% hạt micro mịn (3.0px - 5.5px) tạo dải ngân hà bụi kim cương óng ánh
-      // - 20% hạt sao trung bình (6.5px - 11.0px) lấp lánh rõ nét
-      // - 5% hạt tinh thể kim cương lớn (16.0px - 34.0px) lóa sáng nổi bật
+      // Kích thước quang học 2K/4K:
       const sizeRand = ((Math.sin(i * 513.11 + 23.4) * 43758.54) % 1 + 1) % 1;
-      let baseSize = 3.2 + sizeRand * 3.0;
-      if (sizeRand > 0.75 && sizeRand <= 0.95) {
-        baseSize = 7.0 + (sizeRand - 0.75) * 18.0;
-      } else if (sizeRand > 0.95) {
-        baseSize = 18.0 + (sizeRand - 0.95) * 60.0;
+      let baseSize = 2.4 + sizeRand * 2.8;
+
+      // Ở "Cụm sáng chính" (tâm đĩa và viền sau), tăng kích thước hạt để tạo vầng sáng chói (bloom)
+      const isCore = normX < 0.40 && Math.sin(theta) < 0.2;
+      if (isCore) {
+        baseSize *= 1.45;
       }
 
-      rnd[i * 4 + 0] = 1.0 + (i % 8); // Tần số chu kỳ nguyên (1..8) đảm bảo Seamless Loop 100%
-      rnd[i * 4 + 1] = (i * 2.399) % (Math.PI * 2); // Pha ngẫu nhiên
-      rnd[i * 4 + 2] = baseSize;
-      rnd[i * 4 + 3] = 0.5 + (i % 5) * 0.2; // Biên độ trôi dạt nhẹ
+      if (sizeRand > 0.80 && sizeRand <= 0.95) {
+        baseSize = 6.0 + (sizeRand - 0.80) * 14.0;
+      } else if (sizeRand > 0.95) {
+        baseSize = 16.0 + (sizeRand - 0.95) * 50.0; // Điểm sao kim cương lóe sáng
+      }
 
-      // Tông màu: Bụi bạc kim cương thuần khiết điểm xuyết ánh xanh ngọc băng
+      rnd[i * 4 + 0] = 1.0 + (i % 8); // Tần số chu kỳ nguyên Seamless Loop
+      rnd[i * 4 + 1] = (i * 2.399) % (Math.PI * 2);
+      rnd[i * 4 + 2] = baseSize;
+      rnd[i * 4 + 3] = 0.4 + (i % 5) * 0.2;
+
+      // Tông màu & Quang thông:
+      // Trung tâm sáng rực (coreBoost), 2 biên tối dần theo hàm cosin mượt mà ("Biên tối tạo độ sâu")
+      const centerFactor = Math.max(0.12, Math.cos(normX * (Math.PI * 0.48)));
+      const coreBoost = isCore ? 1.45 : 1.0;
+
       const colRand = ((Math.sin(i * 841.3 + 17.2) * 19283.4) % 1 + 1) % 1;
-      if (colRand > 0.72) {
-        col[i * 3 + 0] = 0.90;
-        col[i * 3 + 1] = 0.95;
-        col[i * 3 + 2] = 1.0;
+      if (colRand > 0.75) {
+        col[i * 3 + 0] = 0.92 * centerFactor * coreBoost;
+        col[i * 3 + 1] = 0.96 * centerFactor * coreBoost;
+        col[i * 3 + 2] = 1.0 * centerFactor * coreBoost;
       } else {
-        col[i * 3 + 0] = 1.0;
-        col[i * 3 + 1] = 1.0;
-        col[i * 3 + 2] = 1.0;
+        col[i * 3 + 0] = 1.0 * centerFactor * coreBoost;
+        col[i * 3 + 1] = 1.0 * centerFactor * coreBoost;
+        col[i * 3 + 2] = 1.0 * centerFactor * coreBoost;
       }
     }
 

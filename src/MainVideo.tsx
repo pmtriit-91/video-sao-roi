@@ -32,15 +32,16 @@ export const MainVideo: React.FC<MainVideoProps> = ({
       {/* Nạp font thư pháp & serif cao cấp */}
       <FontLoader />
 
-      {/* Layer 1: Nền nhung đen & Cột ánh sáng sân khấu */}
+      {/* Layer 1: Nền nhung đen (Tạm tắt cột sáng sân khấu để tập trung trần sao) */}
       <StageBackdrop
         palette={palette}
         width={width}
         height={height}
         loopDurationFrames={config.loopDurationFrames}
+        showBeams={false}
       />
 
-      {/* Layer 2: Vòm mây sao lấp lánh đỉnh màn hình */}
+      {/* Layer 2: Trần sao 3D (Đang tập trung xử lý và tinh chỉnh chuẩn theo ảnh 1 và ảnh 3) */}
       <StarCanopy
         palette={palette}
         width={width}
@@ -49,8 +50,8 @@ export const MainVideo: React.FC<MainVideoProps> = ({
         loopDurationFrames={config.loopDurationFrames}
       />
 
-      {/* Layer 3: Cơn mưa sao rơi tự do & Hạt kim cương lóe sáng */}
-      <FallingStars
+      {/* Layer 3: Cơn mưa sao rơi tự do (Tạm tắt để tránh nhiễu theo chỉ thị) */}
+      {/* <FallingStars
         palette={palette}
         width={width}
         height={height}
@@ -58,25 +59,25 @@ export const MainVideo: React.FC<MainVideoProps> = ({
         loopDurationFrames={config.loopDurationFrames}
         safeZoneWidth={config.safeZoneWidth * (width / 2560)}
         safeZoneHeight={config.safeZoneHeight * (height / 1440)}
-      />
+      /> */}
 
-      {/* Layer 4: Thảm kim tuyến phản chiếu phối cảnh 3D mặt sàn */}
-      <StageFloor
+      {/* Layer 4: Thảm kim tuyến mặt sàn (Tạm tắt để tránh nhiễu theo chỉ thị) */}
+      {/* <StageFloor
         palette={palette}
         width={width}
         height={height}
         count={config.floorCount}
         loopDurationFrames={config.loopDurationFrames}
-      />
+      /> */}
 
-      {/* Layer 5: Định danh trung tâm (Monogram Logo + Tên Dâu Rể + Ngày cưới) */}
-      <CenterTypography
+      {/* Layer 5: Định danh trung tâm (Tạm tắt để tránh nhiễu theo chỉ thị) */}
+      {/* <CenterTypography
         config={config}
         palette={palette}
         width={width}
         height={height}
         loopDurationFrames={config.loopDurationFrames}
-      />
+      /> */}
     </div>
   );
 };

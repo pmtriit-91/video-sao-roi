@@ -7,6 +7,7 @@ interface StageBackdropProps {
   width?: number;
   height?: number;
   loopDurationFrames?: number;
+  showBeams?: boolean;
 }
 
 export const StageBackdrop: React.FC<StageBackdropProps> = ({
@@ -14,6 +15,7 @@ export const StageBackdrop: React.FC<StageBackdropProps> = ({
   width = 2560,
   height = 1440,
   loopDurationFrames = 1200,
+  showBeams = true,
 }) => {
   const frame = useCurrentFrame();
 
@@ -58,7 +60,8 @@ export const StageBackdrop: React.FC<StageBackdropProps> = ({
       />
 
       {/* 2. Các cột ánh sáng sân khấu quét dọc chuyển động chậm (Volumetric Beams) */}
-      {beams.map((b, i) => {
+      {showBeams &&
+        beams.map((b, i) => {
         // Dao động vị trí ngang và độ sáng theo hàm sin tuần hoàn hoàn hảo
         const sway = Math.sin(loopAngle * b.speedMult + b.phase) * 45;
         const breath = (Math.sin(loopAngle * b.speedMult + b.phase * 1.5) * 0.3 + 0.7) * b.opacityBase;
