@@ -4,6 +4,7 @@ import { CenterTypography } from "./components/CenterTypography";
 import { FallingStars } from "./components/FallingStars";
 import { FontLoader } from "./components/FontLoader";
 import { StageBackdrop } from "./components/StageBackdrop";
+import { StageBeamsThree } from "./components/StageBeamsThree";
 import { StageFloorThree as StageFloor } from "./components/StageFloorThree";
 import { StarCanopyThree as StarCanopy } from "./components/StarCanopyThree";
 import { getActivePalette, starConfig } from "./config/starConfig";
@@ -32,13 +33,21 @@ export const MainVideo: React.FC<MainVideoProps> = ({
       {/* Nạp font thư pháp & serif cao cấp */}
       <FontLoader />
 
-      {/* Layer 1: Nền nhung đen (Tạm tắt cột sáng sân khấu để tập trung trần & sàn) */}
-      <StageBackdrop
+      {/* Layer 1: Nền nhung đen (Đã tắt hẳn theo yêu cầu) */}
+      {/* <StageBackdrop
         palette={palette}
         width={width}
         height={height}
         loopDurationFrames={config.loopDurationFrames}
         showBeams={false}
+      /> */}
+
+      {/* Layer 1.5: Cột sáng thể tích 3D kết nối trần vòm - sàn (Phối cảnh tỏa quạt Three.js WebGL) */}
+      <StageBeamsThree
+        palette={palette}
+        width={width}
+        height={height}
+        loopDurationFrames={config.loopDurationFrames}
       />
 
       {/* Layer 2: Trần sao 3D (Đã hoàn thiện xuất sắc theo Ảnh 1 & 3) */}
