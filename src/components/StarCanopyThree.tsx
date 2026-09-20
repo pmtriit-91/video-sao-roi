@@ -59,12 +59,13 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
     const col = new Float32Array(count * 3);
 
     // Kích thước hình học đĩa trần 3D:
-    // Căn chỉnh tỷ lệ vòm trên thấp gọn (~21% chiều cao khung hình), nhường khoảng trống trung tâm lớn nhất
+    // Thu nhỏ theo đúng tỷ lệ đồng dạng (scale = 0.80) để giữ 100% style nguyên bản, mở rộng biên tối hai bên
+    const scale = 0.75;
     const ceilingY = 540;      // Nâng trần cao hơn để vòm gọn gàng, thanh thoát
     const thicknessY = 80;     // Độ dày lớp mây bụi trần
     const centerZ = -50;       // Tâm đĩa trần
-    const radiusX = 1800;      // Bán kính ngang bao trùm trần
-    const radiusZ = 520;       // Bán kính sâu (mép sau z=-570 hạ xuống đúng 21% mép trên, mép trước tràn đỉnh màn hình)
+    const radiusX = 1800 * scale; // Bán kính ngang thu gọn đồng dạng (1350)
+    const radiusZ = 520 * scale;  // Bán kính sâu thu gọn đồng dạng (390)
 
     for (let i = 0; i < count; i++) {
       // Hàm băm giả ngẫu nhiên xác định (deterministic PRNG)
