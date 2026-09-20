@@ -59,7 +59,7 @@ export const starConfig: WeddingStarConfig = {
   // 4. Mật độ hạt sao dày đặc, lấp lánh như bụi kim cương trong clip mẫu
   canopyCount: 35000,  // 35,000 hạt bụi sao li ti ở vòm đỉnh (3D WebGL Shader)
   fallingCount: 140,   // Hạt sao mưa rơi bồng bềnh
-  floorCount: 450,     // Hạt sao thảm sàn có chiều sâu phối cảnh
+  floorCount: 35000,   // 35,000 hạt thảm sàn kim cương phối cảnh 3D (Three.js WebGL)
   beamCount: 6,        // Số cột ánh sáng sân khấu
 
   // 5. Kích thước vùng an toàn chữ ở giữa màn hình
