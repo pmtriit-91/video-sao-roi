@@ -58,13 +58,13 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
     const col = new Float32Array(count * 3);
 
     // Kích thước hình học đĩa sàn 3D:
-    // Thu nhỏ theo đúng tỷ lệ đồng dạng (scale = 0.80) để giữ 100% style nguyên bản, mở rộng biên tối hai bên
-    const scale = 0.75;
+    // Thu nhỏ vừa phải (scale = 0.72) để sàn rộng hơn vòm trần, tạo bệ đỡ ánh sáng vững chãi
+    const scale = 0.68;
     const floorY = -465;       // Nâng nhẹ độ cao sàn để viền chân trời sàn đạt tỷ lệ chuẩn xác
     const thicknessY = 50;     // Độ dày mỏng phẳng phiu của mặt sàn phản chiếu
     const centerZ = -180;      // Tâm đĩa sàn
-    const radiusX = 1800 * scale; // Bán kính ngang thu gọn đồng dạng (1350)
-    const radiusZ = 850 * scale;  // Bán kính sâu thu gọn đồng dạng (637)
+    const radiusX = 1800 * scale; // Bán kính ngang (1224)
+    const radiusZ = 850 * scale;  // Bán kính sâu (578)
 
     for (let i = 0; i < count; i++) {
       // Hàm băm giả ngẫu nhiên xác định (deterministic PRNG)
