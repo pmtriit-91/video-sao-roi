@@ -76,32 +76,21 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
       // Góc theta phân bố vòng quanh đĩa:
       const theta = h1 * Math.PI * 2;
 
-      // Bán kính r: 50% hạt dồn vào cụm trung tâm và viền hậu cảnh (Cụm sáng chính)
-      let r: number;
-      if (h2 < 0.55) {
-        // Hạt tập trung trong vùng lõi phát quang
-        r = Math.pow(h3, 1.35) * 0.75;
-      } else {
-        // Hạt phân tán đều ra toàn bộ đĩa
-        r = Math.pow(h3, 0.95);
-      }
+      // Bán kính r: Phân bố hạt trải rộng tự nhiên, tạo dải sáng ngang bề thế
+      const r = Math.pow(h2, 1.15);
 
+      // Trục hoành X và trục sâu Z của đĩa trần 3D:
       const x = Math.cos(theta) * r * radiusX;
       const z = centerZ + Math.sin(theta) * r * radiusZ;
       const normX = Math.abs(x) / radiusX;
 
-      // Độ cao Y:
+      // Độ cao Y (Mặt phẳng trần có độ dày thể tích và tán xạ sương mù):
       let y = ceilingY + (h4 - 0.5) * thicknessY;
 
-      // Ở viền sau (mép nhìn thấy của trần), tăng nhẹ độ dày và nở sáng
-      const isRearBorder = Math.sin(theta) < -0.3;
-      if (isRearBorder && normX < 0.45) {
-        y += (h5 - 0.5) * 35;
-      }
-
-      // 8% hạt bụi kim cương sa nhẹ xuống dưới trần
-      if (h3 > 0.92) {
-        y -= Math.pow(h5, 2.0) * 110;
+      // Tán xạ mây bụi sa nhẹ xuống vùng trung tâm sân khấu (như trong clip gốc Ảnh 3)
+      const isRear = Math.sin(theta) < -0.15;
+      if (isRear && h3 > 0.62) {
+        y -= Math.pow(h5, 1.6) * 130;
       }
 
       pos[i * 3 + 0] = x;
@@ -112,37 +101,37 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
       const sizeRand = ((Math.sin(i * 513.11 + 23.4) * 43758.54) % 1 + 1) % 1;
       let baseSize = 2.4 + sizeRand * 2.8;
 
-      // Ở "Cụm sáng chính" (tâm đĩa và viền sau), tăng kích thước hạt để tạo vầng sáng chói (bloom)
-      const isCore = normX < 0.40 && Math.sin(theta) < 0.2;
-      if (isCore) {
-        baseSize *= 1.45;
+      // Độ sáng và độ nở hạt theo hàm Gauss mượt mà chuẩn quang học (rộng 45% chiều ngang)
+      const centerGlow = Math.exp(-Math.pow(normX / 0.46, 2.0));
+      if (centerGlow > 0.35 && isRear) {
+        baseSize *= (1.0 + centerGlow * 0.45);
       }
 
-      if (sizeRand > 0.80 && sizeRand <= 0.95) {
-        baseSize = 6.0 + (sizeRand - 0.80) * 14.0;
-      } else if (sizeRand > 0.95) {
-        baseSize = 16.0 + (sizeRand - 0.95) * 50.0; // Điểm sao kim cương lóe sáng
+      if (sizeRand > 0.82 && sizeRand <= 0.96) {
+        baseSize = 6.5 + (sizeRand - 0.82) * 14.0;
+      } else if (sizeRand > 0.96) {
+        baseSize = 16.0 + (sizeRand - 0.96) * 55.0; // Tinh thể kim cương phát quang
       }
 
-      rnd[i * 4 + 0] = 1.0 + (i % 8); // Tần số chu kỳ nguyên Seamless Loop
+      rnd[i * 4 + 0] = 1.0 + (i % 8); // Tần số nguyên Seamless Loop 100%
       rnd[i * 4 + 1] = (i * 2.399) % (Math.PI * 2);
       rnd[i * 4 + 2] = baseSize;
       rnd[i * 4 + 3] = 0.4 + (i % 5) * 0.2;
 
       // Tông màu & Quang thông:
-      // Trung tâm sáng rực (coreBoost), 2 biên tối dần theo hàm cosin mượt mà ("Biên tối tạo độ sâu")
-      const centerFactor = Math.max(0.12, Math.cos(normX * (Math.PI * 0.48)));
-      const coreBoost = isCore ? 1.45 : 1.0;
+      // "Biên tối tạo độ sâu" ở 2 bên mép, "Cụm sáng chính" rực rỡ ở vùng giữa
+      const edgeFade = Math.max(0.1, Math.cos(normX * (Math.PI * 0.46)));
+      const brightness = (0.75 + centerGlow * 0.65) * edgeFade;
 
       const colRand = ((Math.sin(i * 841.3 + 17.2) * 19283.4) % 1 + 1) % 1;
       if (colRand > 0.75) {
-        col[i * 3 + 0] = 0.92 * centerFactor * coreBoost;
-        col[i * 3 + 1] = 0.96 * centerFactor * coreBoost;
-        col[i * 3 + 2] = 1.0 * centerFactor * coreBoost;
+        col[i * 3 + 0] = 0.92 * brightness;
+        col[i * 3 + 1] = 0.96 * brightness;
+        col[i * 3 + 2] = 1.0 * brightness;
       } else {
-        col[i * 3 + 0] = 1.0 * centerFactor * coreBoost;
-        col[i * 3 + 1] = 1.0 * centerFactor * coreBoost;
-        col[i * 3 + 2] = 1.0 * centerFactor * coreBoost;
+        col[i * 3 + 0] = 1.0 * brightness;
+        col[i * 3 + 1] = 1.0 * brightness;
+        col[i * 3 + 2] = 1.0 * brightness;
       }
     }
 
