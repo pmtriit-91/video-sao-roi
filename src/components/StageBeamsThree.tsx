@@ -258,6 +258,7 @@ export const StageBeamsThree: React.FC<StageBeamsThreeProps> = ({
     scene.add(mesh);
 
     return () => {
+      renderer.forceContextLoss();
       renderer.dispose();
       material.dispose();
     };

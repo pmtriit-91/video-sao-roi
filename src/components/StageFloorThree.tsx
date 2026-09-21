@@ -278,6 +278,7 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
         scene.add(points);
 
         return () => {
+            renderer.forceContextLoss();
             renderer.dispose();
             geometry.dispose();
             material.dispose();

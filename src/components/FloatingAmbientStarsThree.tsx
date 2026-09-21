@@ -286,6 +286,7 @@ export const FloatingAmbientStarsThree: React.FC<FloatingAmbientStarsThreeProps>
     scene.add(points);
 
     return () => {
+      renderer.forceContextLoss();
       renderer.dispose();
       geometry.dispose();
       material.dispose();

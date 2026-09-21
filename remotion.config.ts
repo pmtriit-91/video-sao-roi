@@ -10,4 +10,5 @@ Config.setPixelFormat("yuv420p");
 Config.setCrf(18);
 Config.setAudioCodec("aac");
 Config.setAudioBitrate("320k");
-Config.setConcurrency(null); // Tự động dùng toàn bộ số nhân CPU
+Config.setChromiumOpenGlRenderer("angle"); // Kích hoạt ANGLE GPU phần cứng cho Three.js WebGL (tránh lỗi crash WebGL context)
+Config.setConcurrency(4); // Mức đa luồng an toàn cho 4 WebGL canvas 4K cùng lúc
