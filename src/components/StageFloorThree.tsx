@@ -64,7 +64,7 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
         const floorY = -465; // Nâng nhẹ độ cao sàn để viền chân trời sàn đạt tỷ lệ chuẩn xác
         const thicknessY = 50; // Độ dày mỏng phẳng phiu của mặt sàn phản chiếu
         const centerZ = -80; // Tâm đĩa sàn
-        const radiusX = 2200 * scale; // Bán kính ngang (1224)
+        const radiusX = 1800 * scale; // Bán kính ngang (1224)
         const radiusZ = 900 * scale; // Bán kính sâu (578)
 
         for (let i = 0; i < count; i++) {
