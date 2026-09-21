@@ -39,7 +39,7 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
     width = 2560,
     height = 1440,
     count = 35000,
-    loopDurationFrames = 1200,
+    loopDurationFrames = 2400,
 }) => {
     const frame = useCurrentFrame();
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -84,11 +84,11 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
             if (!isFlow) {
                 // Hạt vùng lõi & trung tâm: phân bố lũy thừa tạo đĩa sáng tâm rực rỡ
                 r = Math.pow(h2, 1.25);
-                flowSpeed = 1; // 100% hạt đều tham gia vào dòng chảy lan tỏa
+                flowSpeed = 2; // Nhân đôi cho video 40s để giữ nguyên 100% vận tốc lan tỏa
             } else {
                 // Hạt vươn rộng ra toàn sàn
                 r = 0.2 + 0.85 * Math.pow(h2, 0.95);
-                flowSpeed = i % 4 === 0 ? 2 : 1;
+                flowSpeed = i % 4 === 0 ? 4 : 2;
             }
 
             // Trục hoành X và trục sâu Z của đích đến lan tỏa:
@@ -220,8 +220,8 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
 
           vec3 pos = mix(uCenter, position, rNorm);
 
-          // Nhịp nhấp nháy êm dịu, không giật chớp loạn mắt
-          float twinkleFreq = 1.0 + mod(twinklePhase, 2.0);
+          // Nhịp nhấp nháy êm dịu, không giật chớp loạn mắt (nhân đôi tần số cho video 40s)
+          float twinkleFreq = (1.0 + mod(twinklePhase, 2.0)) * 2.0;
           float twinkle = sin(uLoopAngle * twinkleFreq + twinklePhase);
           float alphaNorm = 0.70 + 0.30 * twinkle;
 
@@ -242,7 +242,7 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
 
           // Điểm xuyết hạt sáng lấp lánh mạnh (~2% mật độ)
           if (sparkle > 0.5) {
-            float flash = pow(max(0.0, sin(uLoopAngle * sparkle + twinklePhase * 2.0)), 6.0);
+            float flash = pow(max(0.0, sin(uLoopAngle * sparkle * 2.0 + twinklePhase * 2.0)), 6.0);
             sizeGrowth *= (1.0 + flash * 1.5);
             alphaMult = min(1.0, alphaMult + flash * 0.4);
             alphaNorm = min(1.0, alphaNorm + flash * 0.5);

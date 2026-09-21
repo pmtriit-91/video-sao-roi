@@ -26,7 +26,7 @@ export const StageBeamsThree: React.FC<StageBeamsThreeProps> = ({
   palette,
   width = 2560,
   height = 1440,
-  loopDurationFrames = 1200,
+  loopDurationFrames = 2400,
 }) => {
   const frame = useCurrentFrame();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -180,12 +180,12 @@ export const StageBeamsThree: React.FC<StageBeamsThreeProps> = ({
           // 1. Chuyển động quét góc nghệ thuật (Pivot Spotlight):
           // Neo cố định ở trần vòm sao (uv.y = 1.0 -> 0), thân và đuôi quét con lắc êm dịu (uv.y = 0.0 -> max)
           // Đảm bảo toán học: tia sáng vẫn giữ THẲNG TẮP 100% từ điểm neo trần xuống sàn
-          float swayAmount = sin(uLoopAngle * 1.6 + phase) * 16.0;
+          float swayAmount = sin(uLoopAngle * 3.2 + phase) * 16.0;
           float sway = swayAmount * (1.0 - uv.y);
 
-          // 2. Nhịp thở quang thông hữu cơ, bồng bềnh:
-          float slowWave = sin(uLoopAngle * speedMult + phase);
-          float secondWave = sin(uLoopAngle * (speedMult * 2.0) + phase * 1.7) * 0.25;
+          // 2. Nhịp thở quang thông hữu cơ, bồng bềnh (nhân đôi tần số cho video 40s):
+          float slowWave = sin(uLoopAngle * (speedMult * 2.0) + phase);
+          float secondWave = sin(uLoopAngle * (speedMult * 4.0) + phase * 1.7) * 0.25;
           float normMod = clamp(0.5 + 0.5 * (slowWave * 0.80 + secondWave), 0.0, 1.0);
 
           float dynamicBreath = mix(0.22, 1.25, normMod);

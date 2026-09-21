@@ -17,7 +17,7 @@ export const FallingStars: React.FC<FallingStarsProps> = ({
   width = 2560,
   height = 1440,
   count = 95,
-  loopDurationFrames = 1200,
+  loopDurationFrames = 2400,
   safeZoneWidth = 1200,
   safeZoneHeight = 650,
 }) => {
@@ -39,9 +39,9 @@ export const FallingStars: React.FC<FallingStarsProps> = ({
         initialX: rand1 * width,
         initialY: rand2 * (height + 200) - 100,
         size: isDiamondCross ? 14 + rand3 * 16 : 3.5 + rand3 * 6.5,
-        speed: 1, // Luôn rơi đúng 1 hoặc 2 chu kỳ hoàn chỉnh trong loopDurationFrames
+        speed: 2, // Nhân đôi cho video 40s để giữ nguyên tốc độ rơi
         swayAmp: 18 + rand2 * 32,
-        swayFreq: 2 + (i % 4), // Số chu kỳ lắc lư trong loopDurationFrames
+        swayFreq: (2 + (i % 4)) * 2, // Số chu kỳ lắc lư trong 40s
         phase: rand4, // Pha thời gian bắt đầu
         isDiamondCross,
         opacityBase: 0.5 + rand1 * 0.45,

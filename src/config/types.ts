@@ -60,7 +60,7 @@ export interface WeddingStarConfig {
   customPalette?: Partial<ColorPalette>;
 
   // Cấu hình thời lượng & chuyển động
-  loopDurationFrames: number; // Mặc định 900 frames (15s @ 60fps) hoặc 1200 frames (20s @ 60fps)
+  loopDurationFrames: number; // Mặc định 2400 frames (40s @ 60fps)
 
   // Mật độ hạt
   canopyCount: number;

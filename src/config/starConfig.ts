@@ -53,8 +53,8 @@ export const starConfig: WeddingStarConfig = {
   // 2. Chủ đề màu sắc ('silverDiamond' | 'champagneGold' | 'midnightSapphire' | 'roseGold')
   theme: "silverDiamond",
 
-  // 3. Thời lượng vòng lặp lặp lại (1200 frames @ 60fps = 20 giây Seamless Loop)
-  loopDurationFrames: 1200,
+  // 3. Thời lượng vòng lặp lặp lại (2400 frames @ 60fps = 40 giây Seamless Loop)
+  loopDurationFrames: 2400,
 
   // 4. Mật độ hạt sao dày đặc, lấp lánh như bụi kim cương trong clip mẫu
   canopyCount: 35000,  // 35,000 hạt bụi sao li ti ở vòm đỉnh (3D WebGL Shader)

@@ -50,7 +50,7 @@ export const FloatingAmbientStarsThree: React.FC<FloatingAmbientStarsThreeProps>
   width = 2560,
   height = 1440,
   count = 60,
-  loopDurationFrames = 1200,
+  loopDurationFrames = 2400,
 }) => {
   const frame = useCurrentFrame();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -127,7 +127,7 @@ export const FloatingAmbientStarsThree: React.FC<FloatingAmbientStarsThreeProps>
       // Độ lắc lư uốn lượn tự do (Wave Sway parameters):
       const swayAmpX = 25 + h3 * 55; // 25px đến 80px
       const swayAmpY = 18 + h4 * 38; // 18px đến 56px
-      const swayFreq = 1 + (i % 3);  // Số nguyên 1, 2, 3 để 100% Seamless Loop
+      const swayFreq = (1 + (i % 3)) * 2;  // Nhân đôi cho video 40s để giữ nguyên chu kỳ lắc lư
       const swayPhase = h5 * Math.PI * 2;
 
       sway[i * 4 + 0] = swayAmpX;
@@ -136,10 +136,10 @@ export const FloatingAmbientStarsThree: React.FC<FloatingAmbientStarsThreeProps>
       sway[i * 4 + 3] = swayPhase;
 
       // Chu kỳ và tốc độ chớp kim cương:
-      const speedMult = (i % 5 === 0) ? 2 : 1; // Số nguyên 1 hoặc 2 chu trình hoàn chỉnh trong 20s
+      const speedMult = ((i % 5 === 0) ? 2 : 1) * 2; // Nhân đôi cho video 40s để giữ nguyên tốc độ bay
       const phase = h2;
       const baseSize = 14.0 + h4 * 22.0;       // Kích thước hạt từ 14px đến 36px (nổi bật, rõ nét)
-      const sparkleSpeed = 3 + (i % 5);        // Tần số chớp số nguyên (3..7)
+      const sparkleSpeed = (3 + (i % 5)) * 2;        // Tần số chớp số nguyên nhân đôi
 
       rnd[i * 4 + 0] = speedMult;
       rnd[i * 4 + 1] = phase;
@@ -251,8 +251,8 @@ export const FloatingAmbientStarsThree: React.FC<FloatingAmbientStarsThreeProps>
           float flash = pow(max(0.0, sin(uLoopAngle * sparkleSpeed + swayPhase)), 6.0);
           float sparkleSize = 1.0 + flash * 1.5;
 
-          // Nhịp thở phát quang nền nhẹ nhàng
-          float breathing = 0.65 + 0.35 * sin(uLoopAngle * 2.0 + swayPhase);
+          // Nhịp thở phát quang nền nhẹ nhàng (nhân đôi tần số cho video 40s)
+          float breathing = 0.65 + 0.35 * sin(uLoopAngle * 4.0 + swayPhase);
 
           // Tăng cường độ sáng trắng rực rỡ khi đạt đỉnh lóe sáng
           vec3 starColor = mix(customColor, vec3(2.4, 2.4, 2.8), flash * 0.85);
