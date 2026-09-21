@@ -38,34 +38,32 @@ export const StageBeamsThree: React.FC<StageBeamsThreeProps> = ({
 
   const loopAngle = (frame / loopDurationFrames) * Math.PI * 2;
 
-  // 1. Dựng hình học 3D của các cột sáng kết nối trần vòm và sàn sân khấu
-  // Ánh sáng KHÔNG chiếu thẳng đứng 90 độ, mà tỏa quạt (fan-out) theo không gian 3D
-  // nhìn từ góc khán giả lên sân khấu: đỉnh trần hẹp hơn, chân sàn mở rộng hơn.
+  // 1. Dựng hình học 3D của các cột sáng:
+  // - Tia sáng THẲNG TẮP 100%, không uốn khúc, không gãy khúc
+  // - Độ lan tỏa và blur rộng mềm mại
   const { geometry } = useMemo(() => {
-    // Đỉnh cắm sâu vào trong lòng vòm sao trần để ẩn mối nối
-    const yTop = 660;
-    // Chân cắm sâu xuống dưới mặt phẳng sàn để tan biến mượt mà vào lớp kim tuyến
-    const yBot = -540;
+    const yTop = 650;
+    const yBot = -530;
 
-    // Phân bổ 6 cột sáng chính theo tỷ lệ chuẩn của video gốc (frame_2s):
-    // Trung tâm để khoảng trống vừa vặn cho Logo Monogram & Tên Dâu Rể
+    // Cường độ vừa vặn: ở đỉnh sáng nhất không bị chói gắt, nhưng vẫn rõ ràng và mờ ảo
+    // Tần số speed (4 - 7) và góc pha phase phân bố so le để các chùm sáng KHÔNG cùng sáng / cùng tối đồng thời
     const beams: BeamConfig[] = [
-      // 1. Cột xa biên trái: nghiêng mạnh ra mép trái
-      { xTop: -780, xBot: -1060, zTop: -230, zBot: -210, wTop: 140, wBot: 390, opacity: 0.28, speed: 1, phase: 0.4 },
-      // 2. Cột trung trái: dải sáng mềm mại bên cánh trái
-      { xTop: -480, xBot: -660,  zTop: -200, zBot: -180, wTop: 160, wBot: 430, opacity: 0.45, speed: 2, phase: 1.2 },
-      // 3. Cột trong trái: dải sáng phông nền sau chữ
-      { xTop: -240, xBot: -340,  zTop: -180, zBot: -160, wTop: 170, wBot: 450, opacity: 0.32, speed: 1, phase: 2.5 },
-      // 4. Cột trong phải: dải sáng phông nền sau chữ
-      { xTop: 240,  xBot: 340,   zTop: -180, zBot: -160, wTop: 170, wBot: 450, opacity: 0.35, speed: 2, phase: 3.8 },
-      // 5. Cột trung phải: CỘT SÁNG NỔI BẬT NHẤT (điểm nhấn thị giác mạnh như trong video gốc)
-      { xTop: 480,  xBot: 670,   zTop: -200, zBot: -180, wTop: 180, wBot: 480, opacity: 0.58, speed: 1, phase: 4.6 },
-      // 6. Cột xa biên phải: nghiêng mạnh ra mép phải
-      { xTop: 780,  xBot: 1060,  zTop: -230, zBot: -210, wTop: 140, wBot: 390, opacity: 0.28, speed: 2, phase: 5.4 },
-      // 7. Dải sáng phụ mềm xa biên trái
-      { xTop: -980, xBot: -1250, zTop: -250, zBot: -230, wTop: 120, wBot: 350, opacity: 0.16, speed: 1, phase: 0.8 },
-      // 8. Dải sáng phụ mềm xa biên phải
-      { xTop: 980,  xBot: 1250,  zTop: -250, zBot: -230, wTop: 120, wBot: 350, opacity: 0.16, speed: 2, phase: 5.8 },
+      // 1. Cột xa biên trái: thẳng tắp theo góc nghiêng phối cảnh
+      { xTop: -750, xBot: -890, zTop: -220, zBot: -200, wTop: 110, wBot: 200, opacity: 0.28, speed: 6, phase: 0.785 },
+      // 2. Cột trung trái: dải sáng lan tỏa mềm mại
+      { xTop: -460, xBot: -550, zTop: -190, zBot: -170, wTop: 130, wBot: 230, opacity: 0.40, speed: 5, phase: 1.571 },
+      // 3. Cột trong trái: dải sáng phông nền êm dịu
+      { xTop: -230, xBot: -280, zTop: -170, zBot: -150, wTop: 140, wBot: 240, opacity: 0.35, speed: 7, phase: 0.000 },
+      // 4. Cột trong phải: dải sáng phông nền êm dịu (lệch pha nửa chu kỳ so với cột trong trái)
+      { xTop: 230,  xBot: 280,  zTop: -170, zBot: -150, wTop: 140, wBot: 240, opacity: 0.36, speed: 5, phase: 3.142 },
+      // 5. Cột trung phải: điểm nhấn sáng chính (êm ái, thanh thoát)
+      { xTop: 460,  xBot: 550,  zTop: -190, zBot: -170, wTop: 140, wBot: 250, opacity: 0.48, speed: 6, phase: 4.712 },
+      // 6. Cột xa biên phải
+      { xTop: 750,  xBot: 890,  zTop: -220, zBot: -200, wTop: 110, wBot: 200, opacity: 0.28, speed: 7, phase: 3.927 },
+      // 7. Dải phụ xa biên trái
+      { xTop: -950, xBot: -1100, zTop: -240, zBot: -220, wTop: 100, wBot: 180, opacity: 0.22, speed: 4, phase: 2.356 },
+      // 8. Dải phụ xa biên phải
+      { xTop: 950,  xBot: 1100,  zTop: -240, zBot: -220, wTop: 100, wBot: 180, opacity: 0.22, speed: 4, phase: 5.498 },
     ];
 
     const positions: number[] = [];
@@ -76,8 +74,6 @@ export const StageBeamsThree: React.FC<StageBeamsThreeProps> = ({
     let vertexOffset = 0;
 
     beams.forEach((b) => {
-      // Các dải sáng hướng trực diện về phía camera khán giả
-      // giúp phân bố ánh sáng Gauss hoàn toàn mịn màng, không có sọc nén góc nghiêng
       const halfWTop = b.wTop / 2;
       const halfWBot = b.wBot / 2;
 
@@ -147,7 +143,6 @@ export const StageBeamsThree: React.FC<StageBeamsThreeProps> = ({
     containerRef.current.innerHTML = "";
     containerRef.current.appendChild(renderer.domElement);
 
-    // Tone màu băng tuyết / xanh ngọc nhạt sang trọng
     const beamBaseColor = new THREE.Color(0.86, 0.93, 1.0);
 
     const material = new THREE.ShaderMaterial({
@@ -168,16 +163,21 @@ export const StageBeamsThree: React.FC<StageBeamsThreeProps> = ({
           float speedMult = aBeamData.y;
           float phase = aBeamData.z;
 
-          // Chuyển động lắc lư quét nhẹ theo góc pha nguyên Seamless Loop 100%
-          float sway = sin(uLoopAngle * speedMult + phase) * 14.0;
-          // Nhịp thở quang thông êm ái
-          float breath = 0.86 + 0.14 * sin(uLoopAngle * speedMult + phase * 1.3);
-          vBeamOpacity = opacityBase * breath;
+          // Chuyển động lắc nhẹ đồng bộ toàn thân để giữ tia luôn THẲNG TẮP (dao động chậm rãi êm dịu)
+          float sway = sin(uLoopAngle * 2.0 + phase) * 5.0;
+
+          // Nhịp thở quang thông sống động (sáng và chìm tối nhanh hơn, tương phản rõ nét):
+          float slowWave = sin(uLoopAngle * speedMult + phase);
+          float secondWave = sin(uLoopAngle * (speedMult * 2.0) + phase * 1.7) * 0.25;
+          float normMod = clamp(0.5 + 0.5 * (slowWave * 0.80 + secondWave), 0.0, 1.0);
+
+          // Chìm tối xuống 0.20 và tăng nhẹ đỉnh sáng nhất từ 1.0 lên 1.22:
+          float dynamicBreath = mix(0.20, 1.22, normMod);
+          vBeamOpacity = opacityBase * dynamicBreath;
 
           vec3 pos = position;
-          // Lắc nhẹ ở phần chân tiếp xúc sàn, đỉnh neo ổn định ở trần
-          float heightNorm = clamp((pos.y - (-540.0)) / (660.0 - (-540.0)), 0.0, 1.0);
-          pos.x += sway * (1.0 - heightNorm * 0.7);
+          // Dịch chuyển thẳng đều toàn bộ thân tia
+          pos.x += sway;
 
           vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
           gl_Position = projectionMatrix * mvPosition;
@@ -192,27 +192,21 @@ export const StageBeamsThree: React.FC<StageBeamsThreeProps> = ({
           float u = vUv.x;
           float v = vUv.y; // 0.0 = Sàn, 1.0 = Trần
 
-          // 1. Phân bố ngang theo hàm Gauss cực kỳ mềm mại
-          float lateral = exp(-pow((u - 0.5) / 0.24, 2.0));
-          // Làm mượt triệt để 2 mép biên
-          float edgeFade = smoothstep(0.0, 0.20, u) * smoothstep(1.0, 0.80, u);
+          // 1. Phân bố ngang: Tăng tối đa độ lan tỏa và độ blur (Gauss sigma = 0.32)
+          // Toàn bộ chùm sáng mờ ảo, lan tỏa đều, không có lõi sắc nhọn
+          float lateral = exp(-pow((u - 0.5) / 0.32, 2.0));
+          float edgeFade = smoothstep(0.0, 0.10, u) * smoothstep(1.0, 0.90, u);
           float totalLateral = lateral * edgeFade;
 
-          // 2. Phân bố dọc kết nối Trần - Sàn:
-          // Đầu trên (Trần): Tan mờ êm dịu sâu trong vòm sao
-          float topFade = smoothstep(1.0, 0.65, v);
-          // Đầu dưới (Sàn): Tan mờ êm dịu sâu dưới mặt phẳng sàn
-          float botFade = smoothstep(0.0, 0.18, v);
-          // Tăng nhẹ cường độ ở đoạn thân và phần phản chiếu sàn
-          float bodyGlow = 0.85 + 0.35 * smoothstep(0.35, 0.10, v);
-
-          float vertProfile = topFade * botFade * bodyGlow;
+          // 2. Phân bố dọc THẲNG TẮP, liên tục, KHÔNG khúc gãy, KHÔNG gợn sóng:
+          float topFade = smoothstep(1.0, 0.72, v);
+          float botFade = smoothstep(0.0, 0.22, v);
+          float vertProfile = topFade * botFade;
 
           float alpha = totalLateral * vertProfile * vBeamOpacity;
           if (alpha < 0.001) discard;
 
-          // Ánh sáng kim cương phát quang
-          gl_FragColor = vec4(uColor * alpha * 1.15, alpha);
+          gl_FragColor = vec4(uColor * alpha * 1.25, alpha);
         }
       `,
       transparent: true,
@@ -250,7 +244,7 @@ export const StageBeamsThree: React.FC<StageBeamsThreeProps> = ({
         width: "100%",
         height: "100%",
         pointerEvents: "none",
-        zIndex: 1, // Nằm sau vòm sao & sàn sao để cộng sáng tự nhiên
+        zIndex: 1,
       }}
     />
   );
