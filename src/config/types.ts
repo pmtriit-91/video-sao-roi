@@ -53,6 +53,8 @@ export interface WeddingStarConfig {
   brideName: string;
   weddingDate: string;
   monogramText: string;
+  logoType?: "builtInHT" | "custom";
+  customLogoPath?: string;
   monogramSvgPath?: string;
 
   // Bảng màu & chủ đề

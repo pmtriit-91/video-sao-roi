@@ -1,3 +1,4 @@
+import { weddingClientConfig } from "../weddingConfig";
 import { ColorPalette, StarColorTheme, WeddingStarConfig } from "./types";
 
 export const THEME_PALETTES: Record<StarColorTheme, ColorPalette> = {
@@ -40,29 +41,31 @@ export const THEME_PALETTES: Record<StarColorTheme, ColorPalette> = {
 };
 
 /**
- * CẤU HÌNH TRUNG TÂM VIDEO SAO RƠI MÀN HÌNH LED
- * Thay đổi thông tin tại đây để xuất video riêng cho từng cặp đôi
+ * CẤU HÌNH TỔNG THỂ HỆ THỐNG VIDEO SAO RƠI MÀN HÌNH LED
+ * Thông tin tiệc cưới được đồng bộ trực tiếp từ file `src/weddingConfig.ts`
  */
 export const starConfig: WeddingStarConfig = {
-  // 1. Thông tin dâu rể (Dùng Title Case để font thư pháp chữ ký hiển thị đẹp và thanh thoát nhất)
-  brideName: "Cẩm Hương",
-  groomName: "Minh Trí",
-  weddingDate: "27.09.2026",
-  monogramText: "HT", // H lồng T (Hương & Trí)
+  // 1. Thông tin dâu rể, ngày cưới, logo & theme từ file cấu hình đám cưới
+  brideName: weddingClientConfig.brideName,
+  groomName: weddingClientConfig.groomName,
+  weddingDate: weddingClientConfig.weddingDate,
+  monogramText: "HT",
+  logoType: weddingClientConfig.logoType,
+  customLogoPath: weddingClientConfig.customLogoPath,
+  monogramSvgPath:
+    weddingClientConfig.logoType === "custom" && weddingClientConfig.customLogoPath
+      ? weddingClientConfig.customLogoPath
+      : undefined,
+  theme: weddingClientConfig.theme,
 
-  // 2. Chủ đề màu sắc ('silverDiamond' | 'champagneGold' | 'midnightSapphire' | 'roseGold')
-  theme: "silverDiamond",
-
-  // 3. Thời lượng vòng lặp lặp lại (2400 frames @ 60fps = 40 giây Seamless Loop)
-  loopDurationFrames: 2400,
-
-  // 4. Mật độ hạt sao dày đặc, lấp lánh như bụi kim cương trong clip mẫu
-  canopyCount: 35000,  // 35,000 hạt bụi sao li ti ở vòm đỉnh (3D WebGL Shader)
-  fallingCount: 140,   // Hạt sao mưa rơi bồng bềnh
-  floorCount: 35000,   // 35,000 hạt thảm sàn kim cương phối cảnh 3D (Three.js WebGL)
+  // 2. Thông số kỹ thuật hệ thống đồ họa 3D Three.js (Đã tối ưu chuẩn, không cần thay đổi)
+  loopDurationFrames: 2400, // 40 giây @ 60fps
+  canopyCount: 35000,  // 35,000 hạt bụi sao vòm trần
+  fallingCount: 140,   // Hạt sao băng rơi bồng bềnh
+  floorCount: 35000,   // 35,000 hạt thảm sàn sao 3D
   beamCount: 6,        // Số cột ánh sáng sân khấu
 
-  // 5. Kích thước vùng an toàn chữ ở giữa màn hình
+  // Vùng an toàn chữ ở giữa màn hình
   safeZoneWidth: 1200,
   safeZoneHeight: 650,
 };

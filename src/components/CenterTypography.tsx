@@ -76,10 +76,84 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
         }}
       >
         {config.monogramSvgPath ? (
-          <Img
-            src={staticFile(config.monogramSvgPath)}
-            style={{ width: width * 0.092, height: "auto" }}
-          />
+          (() => {
+            const logoProgress = isLogoSweeping ? cycleFrame / LOGO_SWEEP_DURATION : 0;
+            const logoEase = isLogoSweeping ? 0.5 - 0.5 * Math.cos(logoProgress * Math.PI) : 0;
+            const logoSweepPos = -25 + logoEase * 150;
+            const logoGlintX = 10 + logoEase * 80;
+            const logoGlintIntensity = isLogoSweeping ? Math.sin(logoProgress * Math.PI) : 0;
+
+            return (
+              <div
+                style={{
+                  position: "relative",
+                  width: width * 0.092,
+                  display: "inline-block",
+                  filter: `drop-shadow(0 4px 14px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 ${10 * glowBreath}px rgba(255, 255, 255, 0.25))`,
+                }}
+              >
+                {/* Logo riêng của khách hàng */}
+                <Img
+                  src={staticFile(config.monogramSvgPath)}
+                  style={{ width: "100%", height: "auto", display: "block" }}
+                />
+
+                {/* Hiệu ứng quét sáng phủ theo phom dáng logo khách */}
+                {isLogoSweeping && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      pointerEvents: "none",
+                      maskImage: `url(${staticFile(config.monogramSvgPath)})`,
+                      WebkitMaskImage: `url(${staticFile(config.monogramSvgPath)})`,
+                      maskSize: "contain",
+                      WebkitMaskSize: "contain",
+                      maskRepeat: "no-repeat",
+                      WebkitMaskRepeat: "no-repeat",
+                      maskPosition: "center",
+                      WebkitMaskPosition: "center",
+                      backgroundImage: `linear-gradient(
+                        125deg,
+                        transparent 0%,
+                        transparent ${logoSweepPos - 18}%,
+                        rgba(255, 255, 255, 0.4) ${logoSweepPos - 9}%,
+                        #FFFFFF ${logoSweepPos}%,
+                        rgba(255, 255, 255, 0.4) ${logoSweepPos + 9}%,
+                        transparent ${logoSweepPos + 18}%,
+                        transparent 100%
+                      )`,
+                      filter: "drop-shadow(0 0 10px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 22px rgba(255, 255, 255, 0.6))",
+                    }}
+                  />
+                )}
+
+                {/* Điểm sao kim cương lướt theo luồng sáng trên logo */}
+                {isLogoSweeping && logoGlintIntensity > 0.05 && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: `${logoGlintX}%`,
+                      top: "50%",
+                      transform: `translate(-50%, -50%) scale(${0.55 + 0.85 * logoGlintIntensity})`,
+                      opacity: logoGlintIntensity,
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <svg width="44" height="44" viewBox="-22 -22 44 44" fill="none">
+                      <circle cx="0" cy="0" r="15" fill="rgba(255, 255, 255, 0.35)" />
+                      <circle cx="0" cy="0" r="7.5" fill="rgba(255, 255, 255, 0.8)" />
+                      <polygon points="-26,0 0,-1.8 26,0 0,1.8" fill="#FFFFFF" />
+                      <polygon points="0,-26 -1.8,0 0,26 1.8,0" fill="#FFFFFF" />
+                      <polygon points="-10,-10 0,-1.2 10,10 0,1.2" fill="rgba(255, 255, 255, 0.95)" />
+                      <polygon points="-10,10 -1.2,0 10,-10 1.2,0" fill="rgba(255, 255, 255, 0.95)" />
+                      <circle cx="0" cy="0" r="2.8" fill="#FFFFFF" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+            );
+          })()
         ) : (
           (() => {
             const isSweeping = isLogoSweeping;
