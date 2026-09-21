@@ -62,7 +62,7 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
         const ceilingY = 580; // Nâng trần cao hơn để vòm gọn gàng, thanh thoát
         const thicknessY = 80; // Độ dày lớp mây bụi trần
         const centerZ = -150; // Tâm đĩa trần
-        const radiusX = 1250; // Bề ngang cụm vòm trên
+        const radiusX = 1300; // Bề ngang cụm vòm trên
         const radiusZ_rear = 370; // Mép sau gọn gàng
         const radiusZ_front = 560; // Mép trước vừa vặn chạm đỉnh màn hình, không bị loe góc
 
