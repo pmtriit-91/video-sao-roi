@@ -74,20 +74,23 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
       const h4 = ((Math.sin(i * 61.1234 + 55.678) * 39182.8765) % 1 + 1) % 1;
       const h5 = ((Math.sin(i * 28.9876 + 73.219) * 51829.4123) % 1 + 1) % 1;
 
-      // Góc theta phân bố vòng quanh đĩa sàn:
       const theta = h1 * Math.PI * 2;
+      const isFlow = (i % 2 === 0); // 50% hạt nền tĩnh êm ả làm bệ đỡ thị giác, 50% hạt trôi thong thả
 
-      // Bán kính r: Dồn hạt dày hơn ở vùng phản chiếu trung tâm và tràn đều ra viền
       let r: number;
-      if (h2 < 0.58) {
-        // 58% hạt dồn vào vũng sáng phản chiếu trung tâm (Hotspot)
-        r = Math.pow(h3, 1.25) * 0.72;
+      let flowSpeed: number;
+
+      if (!isFlow) {
+        // 50% hạt nền tĩnh & lõi: phân bố tự nhiên khắp mặt sàn tạo bệ đỡ vững chãi, không gây rối mắt
+        r = Math.pow(h2, 1.25);
+        flowSpeed = 0;
       } else {
-        // 42% hạt phủ đều ra toàn bộ mặt sàn đến sát tiền cảnh
-        r = Math.pow(h3, 0.92);
+        // 50% hạt lan tỏa: trôi cực kỳ chậm rãi, thong thả từ tâm ra tiền cảnh và các hướng (chu kỳ 40s và 20s)
+        r = 0.20 + 0.85 * Math.pow(h2, 0.95);
+        flowSpeed = (i % 4 === 0) ? 2 : 1; // 75% tốc độ 1 (40s chu kỳ), 25% tốc độ 2 (20s chu kỳ)
       }
 
-      // Trục hoành X và trục sâu Z:
+      // Trục hoành X và trục sâu Z của đích đến lan tỏa:
       const x = Math.cos(theta) * r * radiusX;
       const z = centerZ + Math.sin(theta) * r * radiusZ;
       const normX = Math.abs(x) / radiusX;
@@ -109,16 +112,8 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
       const sizeRand = ((Math.sin(i * 317.11 + 61.4) * 43758.54) % 1 + 1) % 1;
       let baseSize = 2.4 + sizeRand * 2.8;
 
-      // 1. Độ sáng trung tâm theo hàm Gauss mượt mà:
-      const centerGlow = Math.exp(-Math.pow(normX / 0.44, 2.0));
-      if (centerGlow > 0.30 && isCenterArea) {
-        baseSize *= (1.0 + centerGlow * 0.50);
-      }
-
-      // 2. Hiệu ứng hạt Bokeh tiền cảnh (ở gần camera Z > 0, hạt to tròn mờ ảo):
-      if (z > 50) {
-        const frontScale = Math.min(1.0, (z - 50) / 600);
-        baseSize *= (1.0 + frontScale * 0.85);
+      if (!isFlow) {
+        baseSize *= 1.10; // Hạt nền ổn định, sáng rõ
       }
 
       // Hạt sao kim cương lóe sáng trên sàn
@@ -128,15 +123,17 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
         baseSize = 18.0 + (sizeRand - 0.95) * 65.0; // Tinh thể lóa sáng
       }
 
-      rnd[i * 4 + 0] = 1.0 + (i % 8); // Tần số nguyên Seamless Loop 100%
-      rnd[i * 4 + 1] = (i * 2.399) % (Math.PI * 2);
+      const flowPhase = ((h3 + (i / count)) % 1 + 1) % 1;
+      const twinklePhase = (i * 2.399) % (Math.PI * 2);
+
+      rnd[i * 4 + 0] = flowSpeed;
+      rnd[i * 4 + 1] = flowPhase;
       rnd[i * 4 + 2] = baseSize;
-      rnd[i * 4 + 3] = 0.35 + (i % 5) * 0.18;
+      rnd[i * 4 + 3] = twinklePhase;
 
       // Tông màu & Quang thông:
-      // "Biên tối" 2 bên mép, "Vũng sáng phản chiếu" rực rỡ ở giữa
-      const edgeFade = Math.max(0.1, Math.cos(normX * (Math.PI * 0.46)));
-      const brightness = (0.78 + centerGlow * 0.85) * edgeFade;
+      const edgeFade = Math.max(0.12, Math.cos(normX * (Math.PI * 0.46)));
+      const brightness = 1.15 * edgeFade;
 
       const colRand = ((Math.sin(i * 723.1 + 84.2) * 19283.4) % 1 + 1) % 1;
       if (colRand > 0.70) {
@@ -189,33 +186,69 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
       uniforms: {
         uLoopAngle: { value: 0 },
         uPointTexture: { value: starTexture },
+        uCenter: { value: new THREE.Vector3(0, -465, -180) },
       },
       vertexShader: `
         uniform float uLoopAngle;
+        uniform vec3 uCenter;
         attribute vec4 randomData;
         attribute vec3 customColor;
         varying vec3 vColor;
         varying float vAlpha;
 
         void main() {
-          vColor = customColor;
-
-          float freq = randomData.x;
-          float phase = randomData.y;
+          float flowSpeed = randomData.x;
+          float flowPhase = randomData.y;
           float baseSize = randomData.z;
-          float driftAmp = randomData.w;
-
-          float twinkle = sin(uLoopAngle * freq + phase);
-          float alphaNorm = 0.50 + 0.50 * twinkle;
-          vAlpha = alphaNorm;
+          float twinklePhase = randomData.w;
 
           vec3 pos = position;
-          pos.x += sin(uLoopAngle * 2.0 + phase) * driftAmp;
-          pos.z += cos(uLoopAngle * 1.0 + phase) * (driftAmp * 0.8);
+          float alphaMult = 1.0;
+          float sizeGrowth = 1.0;
+
+          // Nhịp nhấp nháy êm dịu, thư thái, không chớp gắt
+          float twinkleFreq = 1.0 + mod(twinklePhase, 2.0);
+          float twinkle = sin(uLoopAngle * twinkleFreq + twinklePhase);
+          float alphaNorm = 0.70 + 0.30 * twinkle;
+
+          if (flowSpeed > 0.5) {
+            // 1. Dòng chảy lan tỏa cực kỳ chậm rãi, thong thả từ tâm ra ngoài
+            float progress = fract(flowPhase + (uLoopAngle / 6.283185307) * flowSpeed);
+            float rNorm = pow(progress, 0.95);
+
+            pos = mix(uCenter, position, rNorm);
+
+            // Độ trôi lượn cực nhẹ trên mặt phẳng sàn (chỉ 2-3px)
+            float driftX = sin(uLoopAngle * 1.0 + twinklePhase) * (3.0 * progress);
+            float driftZ = cos(uLoopAngle * 1.0 + twinklePhase) * (2.0 * progress);
+            pos.x += driftX;
+            pos.z += driftZ;
+
+            // Fade-in mềm ở tâm và Fade-out mượt ở rìa ngoài
+            float fadeCenter = smoothstep(0.0, 0.08, progress);
+            float fadeEdge = smoothstep(1.0, 0.82, progress);
+            alphaMult = fadeCenter * fadeEdge;
+            sizeGrowth = smoothstep(0.0, 0.12, progress) * (0.85 + 0.25 * twinkle);
+          } else {
+            // 2. Hạt nền tĩnh & lõi: lơ lửng cực nhẹ tạo bệ đỡ thị giác vững chãi
+            pos.x += sin(uLoopAngle * 1.0 + twinklePhase) * 2.5;
+            pos.z += cos(uLoopAngle * 1.0 + twinklePhase) * 2.0;
+            alphaMult = 1.0;
+            sizeGrowth = 0.90 + 0.25 * twinkle;
+          }
+
+          // Nở Bokeh khi tia bắn tràn về gần camera (Z > 50)
+          float frontScale = clamp((pos.z - 50.0) / 450.0, 0.0, 1.0);
+          sizeGrowth *= (1.0 + frontScale * 0.85);
+
+          // Tăng nhẹ độ sáng ở vùng tâm
+          float distNorm = length(pos.xz - uCenter.xz) / 1224.0;
+          float coreGlow = 1.0 + 0.55 * exp(-pow(distNorm / 0.35, 2.0));
+          vColor = customColor * coreGlow;
+          vAlpha = alphaMult * alphaNorm;
 
           vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-
-          gl_PointSize = baseSize * (1350.0 / -mvPosition.z) * (0.85 + 0.35 * twinkle);
+          gl_PointSize = baseSize * sizeGrowth * (1350.0 / -mvPosition.z);
           gl_Position = projectionMatrix * mvPosition;
         }
       `,

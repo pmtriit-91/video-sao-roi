@@ -59,8 +59,7 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
         const col = new Float32Array(count * 3);
 
         // Kích thước hình học đĩa trần 3D:
-        // Thu nhỏ toàn bộ cụm vòm trên (radiusX = 820) để khôi phục 2 biên tối hai bên,
-        // đảm bảo chiều rộng bằng hoặc nhỏ hơn sàn dưới một xíu theo đúng chỉ thị
+        // Thu nhỏ toàn bộ cụm vòm trên (radiusX = 1220) để khôi phục 2 biên tối hai bên
         const ceilingY = 560; // Nâng trần cao hơn để vòm gọn gàng, thanh thoát
         const thicknessY = 80; // Độ dày lớp mây bụi trần
         const centerZ = -150; // Tâm đĩa trần
@@ -76,13 +75,23 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
             const h4 = (((Math.sin(i * 73.4561 + 31.241) * 39182.8765) % 1) + 1) % 1;
             const h5 = (((Math.sin(i * 37.8912 + 82.119) * 51829.4123) % 1) + 1) % 1;
 
-            // Góc theta phân bố vòng quanh đĩa:
             const theta = h1 * Math.PI * 2;
+            const isFlow = (i % 2 === 0); // 50% hạt nền tĩnh êm ả làm bệ đỡ thị giác, 50% hạt trôi thong thả
 
-            // Bán kính r: Phân bố hạt trải rộng tự nhiên, tạo dải sáng ngang bề thế
-            const r = Math.pow(h2, 1.15);
+            let r: number;
+            let flowSpeed: number;
 
-            // Trục hoành X và trục sâu Z của đĩa trần 3D:
+            if (!isFlow) {
+                // 50% hạt nền tĩnh & lõi: phân bố tự nhiên khắp vòm, tạo bệ đỡ thị giác ổn định không gây rối mắt
+                r = Math.pow(h2, 1.25);
+                flowSpeed = 0;
+            } else {
+                // 50% hạt lan tỏa: trôi cực kỳ chậm rãi, thong thả từ tâm ra ngoài (chu kỳ 40s và 20s)
+                r = 0.20 + 0.85 * Math.pow(h2, 0.95);
+                flowSpeed = (i % 4 === 0) ? 2 : 1; // 75% tốc độ 1 (40s chu kỳ), 25% tốc độ 2 (20s chu kỳ)
+            }
+
+            // Trục hoành X và trục sâu Z của đích đến lan tỏa:
             const effRadiusZ = Math.sin(theta) > 0 ? radiusZ_front : radiusZ_rear;
             const x = Math.cos(theta) * r * radiusX;
             const z = centerZ + Math.sin(theta) * r * effRadiusZ;
@@ -91,7 +100,7 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
             // Độ cao Y (Mặt phẳng trần có độ dày thể tích và tán xạ sương mù):
             let y = ceilingY + (h4 - 0.5) * thicknessY;
 
-            // Tán xạ mây bụi sa nhẹ xuống vùng trung tâm sân khấu (như trong clip gốc Ảnh 3)
+            // Tán xạ mây bụi sa nhẹ xuống vùng trung tâm sân khấu
             const isRear = Math.sin(theta) < -0.15;
             if (isRear && h3 > 0.62) {
                 y -= Math.pow(h5, 1.6) * 130;
@@ -105,10 +114,8 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
             const sizeRand = (((Math.sin(i * 513.11 + 23.4) * 43758.54) % 1) + 1) % 1;
             let baseSize = 2.4 + sizeRand * 2.8;
 
-            // Độ sáng và độ nở hạt theo hàm Gauss mượt mà chuẩn quang học (rộng 45% chiều ngang)
-            const centerGlow = Math.exp(-Math.pow(normX / 0.46, 2.0));
-            if (centerGlow > 0.35 && isRear) {
-                baseSize *= 1.0 + centerGlow * 0.45;
+            if (!isFlow) {
+                baseSize *= 1.10; // Hạt nền ổn định, sáng rõ
             }
 
             if (sizeRand > 0.82 && sizeRand <= 0.96) {
@@ -117,15 +124,17 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
                 baseSize = 16.0 + (sizeRand - 0.96) * 55.0; // Tinh thể kim cương phát quang
             }
 
-            rnd[i * 4 + 0] = 1.0 + (i % 8); // Tần số nguyên Seamless Loop 100%
-            rnd[i * 4 + 1] = (i * 2.399) % (Math.PI * 2);
+            const flowPhase = ((h3 + (i / count)) % 1 + 1) % 1;
+            const twinklePhase = (i * 2.399) % (Math.PI * 2);
+
+            rnd[i * 4 + 0] = flowSpeed;
+            rnd[i * 4 + 1] = flowPhase;
             rnd[i * 4 + 2] = baseSize;
-            rnd[i * 4 + 3] = 0.4 + (i % 5) * 0.2;
+            rnd[i * 4 + 3] = twinklePhase;
 
             // Tông màu & Quang thông:
-            // "Biên tối tạo độ sâu" ở 2 bên mép, "Cụm sáng chính" rực rỡ ở vùng giữa
-            const edgeFade = Math.max(0.1, Math.cos(normX * (Math.PI * 0.46)));
-            const brightness = (0.75 + centerGlow * 0.65) * edgeFade;
+            const edgeFade = Math.max(0.12, Math.cos(normX * (Math.PI * 0.46)));
+            const brightness = 1.15 * edgeFade;
 
             const colRand = (((Math.sin(i * 841.3 + 17.2) * 19283.4) % 1) + 1) % 1;
             if (colRand > 0.75) {
@@ -178,34 +187,65 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
             uniforms: {
                 uLoopAngle: { value: 0 },
                 uPointTexture: { value: starTexture },
+                uCenter: { value: new THREE.Vector3(0, 560, -150) },
             },
             vertexShader: `
         uniform float uLoopAngle;
+        uniform vec3 uCenter;
         attribute vec4 randomData;
         attribute vec3 customColor;
         varying vec3 vColor;
         varying float vAlpha;
 
         void main() {
-          vColor = customColor;
-
-          float freq = randomData.x;
-          float phase = randomData.y;
+          float flowSpeed = randomData.x;
+          float flowPhase = randomData.y;
           float baseSize = randomData.z;
-          float driftAmp = randomData.w;
-
-          float twinkle = sin(uLoopAngle * freq + phase);
-          float alphaNorm = 0.50 + 0.50 * twinkle;
-          vAlpha = alphaNorm;
+          float twinklePhase = randomData.w;
 
           vec3 pos = position;
-          // Hệ số nguyên 2.0 và 1.0 giúp hạt trôi lơ lửng khép kín chu kỳ hoàn hảo
-          pos.x += sin(uLoopAngle * 2.0 + phase) * driftAmp;
-          pos.y += cos(uLoopAngle * 1.0 + phase) * (driftAmp * 0.6);
+          float alphaMult = 1.0;
+          float sizeGrowth = 1.0;
+
+          // Nhịp nhấp nháy êm dịu, không giật chớp loạn mắt
+          float twinkleFreq = 1.0 + mod(twinklePhase, 2.0);
+          float twinkle = sin(uLoopAngle * twinkleFreq + twinklePhase);
+          float alphaNorm = 0.70 + 0.30 * twinkle;
+
+          if (flowSpeed > 0.5) {
+            // 1. Dòng chảy lan tỏa cực kỳ chậm rãi, thong thả từ tâm ra ngoài
+            float progress = fract(flowPhase + (uLoopAngle / 6.283185307) * flowSpeed);
+            float rNorm = pow(progress, 0.95);
+
+            pos = mix(uCenter, position, rNorm);
+
+            // Độ trôi lượn cực khẽ, mượt mà (chỉ 2-3px, không rung lắc)
+            float driftX = sin(uLoopAngle * 1.0 + twinklePhase) * (3.0 * progress);
+            float driftY = cos(uLoopAngle * 1.0 + twinklePhase) * (2.0 * progress);
+            pos.x += driftX;
+            pos.y += driftY;
+
+            // Fade-in mềm ở tâm và Fade-out mượt ở rìa ngoài
+            float fadeCenter = smoothstep(0.0, 0.08, progress);
+            float fadeEdge = smoothstep(1.0, 0.82, progress);
+            alphaMult = fadeCenter * fadeEdge;
+            sizeGrowth = smoothstep(0.0, 0.12, progress) * (0.85 + 0.25 * twinkle);
+          } else {
+            // 2. Hạt nền tĩnh & lõi: lơ lửng cực nhẹ tạo bệ đỡ thị giác êm ả
+            pos.x += sin(uLoopAngle * 1.0 + twinklePhase) * 2.5;
+            pos.y += cos(uLoopAngle * 1.0 + twinklePhase) * 1.5;
+            alphaMult = 1.0;
+            sizeGrowth = 0.90 + 0.25 * twinkle;
+          }
+
+          // Tăng nhẹ độ sáng ở vùng tâm
+          float distNorm = length(pos.xz - uCenter.xz) / 1220.0;
+          float coreGlow = 1.0 + 0.55 * exp(-pow(distNorm / 0.35, 2.0));
+          vColor = customColor * coreGlow;
+          vAlpha = alphaMult * alphaNorm;
 
           vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-
-          gl_PointSize = baseSize * (1350.0 / -mvPosition.z) * (0.85 + 0.35 * twinkle);
+          gl_PointSize = baseSize * sizeGrowth * (1350.0 / -mvPosition.z);
           gl_Position = projectionMatrix * mvPosition;
         }
       `,
