@@ -52,10 +52,11 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
     const loopAngle = (frame / loopDurationFrames) * Math.PI * 2;
 
     // 1. Phối cảnh 3D Đĩa Sàn Sao Ngang (Horizontal Perspective Floor Disc) đối xứng với Trần sao
-    const { positions, randomData, colors } = useMemo(() => {
+    const { positions, randomData, colors, sparkles } = useMemo(() => {
         const pos = new Float32Array(count * 3);
         const rnd = new Float32Array(count * 4); // [twinkleSpeed, phase, baseSize, driftAmp]
         const col = new Float32Array(count * 3);
+        const sparkles = new Float32Array(count); // Tần số chớp của hạt lấp lánh mạnh (0: bình thường, 3..8: chớp lóe)
 
         // Kích thước hình học đĩa sàn 3D:
         // Thu nhỏ vừa phải (scale = 0.72) để sàn rộng hơn vòm trần, tạo bệ đỡ ánh sáng vững chãi
@@ -123,6 +124,15 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
                 baseSize = 18.0 + (sizeRand - 0.95) * 65.0; // Tinh thể lóa sáng
             }
 
+            // Điểm xuyết ~2% hạt lấp lánh mạnh (mật độ thưa, ngẫu nhiên khắp sàn)
+            const isSparkle = i % 45 === 0;
+            let sparkleSpeed = 0;
+            if (isSparkle) {
+                sparkleSpeed = 3 + (i % 6); // Chu kỳ chớp số nguyên (3..8) để Seamless Loop 100%
+                baseSize = Math.max(baseSize, 6.0 + sizeRand * 5.0);
+            }
+            sparkles[i] = sparkleSpeed;
+
             const flowPhase = (((h3 + i / count) % 1) + 1) % 1;
             const twinklePhase = (i * 2.399) % (Math.PI * 2);
 
@@ -147,7 +157,7 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
             }
         }
 
-        return { positions: pos, randomData: rnd, colors: col };
+        return { positions: pos, randomData: rnd, colors: col, sparkles };
     }, [count]);
 
     // 2. Khởi tạo Three.js
@@ -179,6 +189,7 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
         geometry.setAttribute('randomData', new THREE.BufferAttribute(randomData, 4));
         geometry.setAttribute('customColor', new THREE.BufferAttribute(colors, 3));
+        geometry.setAttribute('sparkle', new THREE.BufferAttribute(sparkles, 1));
 
         const starTexture = createFloorStarSprite();
 
@@ -186,13 +197,14 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
             uniforms: {
                 uLoopAngle: { value: 0 },
                 uPointTexture: { value: starTexture },
-                uCenter: { value: new THREE.Vector3(0, -465, -180) },
+                uCenter: { value: new THREE.Vector3(0, -465, -80) },
             },
             vertexShader: `
         uniform float uLoopAngle;
         uniform vec3 uCenter;
         attribute vec4 randomData;
         attribute vec3 customColor;
+        attribute float sparkle;
         varying vec3 vColor;
         varying float vAlpha;
 
@@ -226,7 +238,18 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
           // Tăng nhẹ độ sáng ở vùng tâm
           float distNorm = length(pos.xz - uCenter.xz) / 1224.0;
           float coreGlow = 1.0 + 0.55 * exp(-pow(distNorm / 0.35, 2.0));
-          vColor = customColor * coreGlow;
+          vec3 starColor = customColor * coreGlow;
+
+          // Điểm xuyết hạt sáng lấp lánh mạnh (~2% mật độ)
+          if (sparkle > 0.5) {
+            float flash = pow(max(0.0, sin(uLoopAngle * sparkle + twinklePhase * 2.0)), 6.0);
+            sizeGrowth *= (1.0 + flash * 1.5);
+            alphaMult = min(1.0, alphaMult + flash * 0.4);
+            alphaNorm = min(1.0, alphaNorm + flash * 0.5);
+            starColor = mix(starColor, vec3(2.2, 2.2, 2.5), flash * 0.9);
+          }
+
+          vColor = starColor;
           vAlpha = alphaMult * alphaNorm;
 
           vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
@@ -259,7 +282,7 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
             geometry.dispose();
             material.dispose();
         };
-    }, [width, height, positions, randomData, colors]);
+    }, [width, height, positions, randomData, colors, sparkles]);
 
     useEffect(() => {
         if (materialRef.current) {

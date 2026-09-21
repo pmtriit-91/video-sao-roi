@@ -52,10 +52,11 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
     const loopAngle = (frame / loopDurationFrames) * Math.PI * 2;
 
     // 1. Phối cảnh 3D Đĩa Trần Sao Ngang (Horizontal Perspective Ceiling Disc) chuẩn 100% UI commit mới nhất
-    const { positions, randomData, colors } = useMemo(() => {
+    const { positions, randomData, colors, sparkles } = useMemo(() => {
         const pos = new Float32Array(count * 3);
         const rnd = new Float32Array(count * 4); // [flowSpeed, flowPhase, baseSize, twinklePhase]
         const col = new Float32Array(count * 3);
+        const sparkles = new Float32Array(count); // Tần số chớp của hạt lấp lánh mạnh (0: bình thường, 3..8: chớp lóe)
 
         // Kích thước hình học đĩa trần 3D chuẩn UI commit latest:
         const ceilingY = 580; // Nâng trần cao hơn để vòm gọn gàng, thanh thoát
@@ -122,6 +123,15 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
                 baseSize = 16.0 + (sizeRand - 0.96) * 55.0; // Tinh thể kim cương phát quang
             }
 
+            // Điểm xuyết ~2% hạt lấp lánh mạnh (mật độ thưa, ngẫu nhiên khắp vòm)
+            const isSparkle = i % 45 === 0;
+            let sparkleSpeed = 0;
+            if (isSparkle) {
+                sparkleSpeed = 3 + (i % 6); // Chu kỳ chớp số nguyên (3..8) để Seamless Loop 100%
+                baseSize = Math.max(baseSize, 5.0 + sizeRand * 4.0);
+            }
+            sparkles[i] = sparkleSpeed;
+
             const flowPhase = (((h3 + i / count) % 1) + 1) % 1;
             const twinklePhase = (i * 2.399) % (Math.PI * 2);
 
@@ -146,7 +156,7 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
             }
         }
 
-        return { positions: pos, randomData: rnd, colors: col };
+        return { positions: pos, randomData: rnd, colors: col, sparkles };
     }, [count]);
 
     // 2. Khởi tạo Three.js
@@ -178,6 +188,7 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
         geometry.setAttribute('randomData', new THREE.BufferAttribute(randomData, 4));
         geometry.setAttribute('customColor', new THREE.BufferAttribute(colors, 3));
+        geometry.setAttribute('sparkle', new THREE.BufferAttribute(sparkles, 1));
 
         const starTexture = createStarSprite();
 
@@ -192,6 +203,7 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
         uniform vec3 uCenter;
         attribute vec4 randomData;
         attribute vec3 customColor;
+        attribute float sparkle;
         varying vec3 vColor;
         varying float vAlpha;
 
@@ -221,7 +233,18 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
           // Tăng độ sáng ở vùng tâm chuẩn 100% commit latest
           float distNorm = length(pos.xz - uCenter.xz) / 1220.0;
           float coreGlow = 1.0 + 0.55 * exp(-pow(distNorm / 0.35, 2.0));
-          vColor = customColor * coreGlow;
+          vec3 starColor = customColor * coreGlow;
+
+          // Điểm xuyết hạt lấp lánh mạnh (~2% mật độ)
+          if (sparkle > 0.5) {
+            float flash = pow(max(0.0, sin(uLoopAngle * sparkle + twinklePhase * 2.0)), 6.0);
+            sizeGrowth *= (1.0 + flash * 1.5);
+            alphaMult = min(1.0, alphaMult + flash * 0.4);
+            alphaNorm = min(1.0, alphaNorm + flash * 0.5);
+            starColor = mix(starColor, vec3(2.2, 2.2, 2.5), flash * 0.9);
+          }
+
+          vColor = starColor;
           vAlpha = alphaMult * alphaNorm;
 
           vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
@@ -254,7 +277,7 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
             geometry.dispose();
             material.dispose();
         };
-    }, [width, height, positions, randomData, colors]);
+    }, [width, height, positions, randomData, colors, sparkles]);
 
     useEffect(() => {
         if (materialRef.current) {
