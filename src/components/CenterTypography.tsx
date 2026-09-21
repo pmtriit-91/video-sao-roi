@@ -443,7 +443,9 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
             textRendering: "optimizeLegibility",
           }}
         >
-          {config.brideName} & {config.groomName}
+          {config.brideName}
+          <span style={{ display: "inline-block", padding: "0 0.42em" }}>&</span>
+          {config.groomName}
         </div>
 
         {/* Layer 2: Lớp loáng sáng trắng tinh khôi quét mượt mà qua các con chữ */}
@@ -476,7 +478,9 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
               textRendering: "optimizeLegibility",
             }}
           >
-            {config.brideName} & {config.groomName}
+            {config.brideName}
+            <span style={{ display: "inline-block", padding: "0 0.42em" }}>&</span>
+            {config.groomName}
           </div>
         )}
 
