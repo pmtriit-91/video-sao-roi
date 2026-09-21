@@ -23,6 +23,35 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
   // Nhịp thở phát quang tinh tế của chữ (Subtle luxury breathing)
   const glowBreath = Math.sin(loopAngle * 2.0) * 0.15 + 0.85;
 
+  // Chu kỳ quét sáng chung: 240 frames (đúng 4.0 giây @ 60fps) - chia hết cho 2400 frames (10 chu kỳ hoàn hảo)
+  const SHIMMER_CYCLE = 240;
+  const cycleFrame = frame % SHIMMER_CYCLE;
+
+  // 1. Quét sáng Monogram Logo: frames 0 -> 90 (~1.5 giây)
+  const LOGO_SWEEP_DURATION = 90;
+  const isLogoSweeping = cycleFrame < LOGO_SWEEP_DURATION;
+
+  // 2. Quét sáng Tên Cô dâu & Chú rể: Thác ánh sáng tiếp nối mượt mà (frames 30 -> 125, ~1.6 giây)
+  const NAME_SWEEP_START = 30;
+  const NAME_SWEEP_DURATION = 95;
+  const isNameSweeping =
+    cycleFrame >= NAME_SWEEP_START &&
+    cycleFrame < NAME_SWEEP_START + NAME_SWEEP_DURATION;
+  const nameProgress = isNameSweeping
+    ? (cycleFrame - NAME_SWEEP_START) / NAME_SWEEP_DURATION
+    : 0;
+  const nameEase = isNameSweeping
+    ? 0.5 - 0.5 * Math.cos(nameProgress * Math.PI)
+    : 0;
+
+  // Vị trí quét từ -25% đến 125% chiều ngang dòng chữ
+  const nameSweepPos = -25 + nameEase * 150;
+  // Tọa độ điểm Glint chạy dọc theo vệt sáng
+  const nameGlintX = 5 + nameEase * 90;
+  const nameGlintIntensity = isNameSweeping
+    ? Math.sin(nameProgress * Math.PI)
+    : 0;
+
   return (
     <div
       style={{
@@ -53,14 +82,8 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
           />
         ) : (
           (() => {
-            // Chu kỳ quét sáng giãn cách sang trọng: 240 frames (đúng 4.0 giây @ 60fps) - chia hết cho 2400 frames (10 chu kỳ lặp hoàn hảo)
-            // Hiệu ứng quét lướt qua trong 1.5 giây, sau đó logo nghỉ ngơi tĩnh lặng 2.5 giây quý phái trước đợt quét tiếp theo
-            const SHIMMER_CYCLE = 240;
-            const SWEEP_DURATION = 90; // 1.5 giây quét mượt mà, giãn cách nghỉ 2.5 giây
-            const cycleFrame = frame % SHIMMER_CYCLE;
-
-            const isSweeping = cycleFrame < SWEEP_DURATION;
-            const sweepProgress = isSweeping ? cycleFrame / SWEEP_DURATION : 0;
+            const isSweeping = isLogoSweeping;
+            const sweepProgress = isSweeping ? cycleFrame / LOGO_SWEEP_DURATION : 0;
 
             // Easing mượt mà dạng Sine in-out chuẩn điện ảnh
             const sweepEase = isSweeping
@@ -318,27 +341,94 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
         )}
       </div>
 
-      {/* 2. Tên Cô dâu & Chú rể (Calligraphy Wedding Script - Nét chữ tinh xảo, sắc nét, không bị nhòe blur) */}
+      {/* 2. Tên Cô dâu & Chú rể (Calligraphy Wedding Script - Nét chữ tinh xảo, sắc nét kèm hiệu ứng loáng sáng trắng tinh khôi) */}
       <div
         style={{
-          fontFamily: "'Great Vibes', 'Alex Brush', cursive",
-          fontSize: width * 0.052, // Tự động co giãn theo 2K (133px) hoặc 4K (200px)
-          color: "#FFFFFF",
-          letterSpacing: "0.02em",
-          lineHeight: 1.25,
+          position: "relative",
+          display: "inline-block",
           textAlign: "center",
-          textShadow: `
-            0 2px 6px rgba(0, 0, 0, 0.85),
-            0 4px 16px rgba(0, 0, 0, 0.7),
-            0 0 16px rgba(255, 255, 255, 0.25)
-          `,
-          opacity: 1,
-          WebkitFontSmoothing: "antialiased",
-          MozOsxFontSmoothing: "grayscale",
-          textRendering: "optimizeLegibility",
         }}
       >
-        {config.brideName} & {config.groomName}
+        {/* Layer 1: Nét chữ gốc - sắc nét 100%, không bị nhòe blur, tương phản nổi bật */}
+        <div
+          style={{
+            fontFamily: "'Great Vibes', 'Alex Brush', cursive",
+            fontSize: width * 0.052, // Tự động co giãn theo 2K (133px) hoặc 4K (200px)
+            color: "#FFFFFF",
+            letterSpacing: "0.02em",
+            lineHeight: 1.25,
+            textAlign: "center",
+            textShadow: `
+              0 2px 6px rgba(0, 0, 0, 0.85),
+              0 4px 16px rgba(0, 0, 0, 0.7),
+              0 0 16px rgba(255, 255, 255, 0.25)
+            `,
+            opacity: 1,
+            WebkitFontSmoothing: "antialiased",
+            MozOsxFontSmoothing: "grayscale",
+            textRendering: "optimizeLegibility",
+          }}
+        >
+          {config.brideName} & {config.groomName}
+        </div>
+
+        {/* Layer 2: Lớp loáng sáng trắng tinh khôi quét mượt mà qua các con chữ */}
+        {isNameSweeping && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              fontFamily: "'Great Vibes', 'Alex Brush', cursive",
+              fontSize: width * 0.052,
+              letterSpacing: "0.02em",
+              lineHeight: 1.25,
+              textAlign: "center",
+              backgroundImage: `linear-gradient(
+                115deg,
+                transparent 0%,
+                transparent ${nameSweepPos - 18}%,
+                rgba(255, 255, 255, 0.35) ${nameSweepPos - 9}%,
+                #FFFFFF ${nameSweepPos}%,
+                rgba(255, 255, 255, 0.35) ${nameSweepPos + 9}%,
+                transparent ${nameSweepPos + 18}%,
+                transparent 100%
+              )`,
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              filter: `drop-shadow(0 0 10px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 22px rgba(255, 255, 255, 0.6))`,
+              pointerEvents: "none",
+              WebkitFontSmoothing: "antialiased",
+              MozOsxFontSmoothing: "grayscale",
+              textRendering: "optimizeLegibility",
+            }}
+          >
+            {config.brideName} & {config.groomName}
+          </div>
+        )}
+
+        {/* Layer 3: Điểm sao kim cương (Diamond Glint) lướt nhẹ cùng luồng sáng trên dòng chữ */}
+        {isNameSweeping && nameGlintIntensity > 0.05 && (
+          <div
+            style={{
+              position: "absolute",
+              left: `${nameGlintX}%`,
+              top: "42%",
+              transform: `translate(-50%, -50%) scale(${0.55 + 0.85 * nameGlintIntensity})`,
+              opacity: nameGlintIntensity,
+              pointerEvents: "none",
+            }}
+          >
+            <svg width="44" height="44" viewBox="-22 -22 44 44" fill="none">
+              <circle cx="0" cy="0" r="15" fill="rgba(255, 255, 255, 0.35)" />
+              <circle cx="0" cy="0" r="7.5" fill="rgba(255, 255, 255, 0.8)" />
+              <polygon points="-26,0 0,-1.8 26,0 0,1.8" fill="#FFFFFF" />
+              <polygon points="0,-26 -1.8,0 0,26 1.8,0" fill="#FFFFFF" />
+              <polygon points="-10,-10 0,-1.2 10,10 0,1.2" fill="rgba(255, 255, 255, 0.95)" />
+              <polygon points="-10,10 -1.2,0 10,-10 1.2,0" fill="rgba(255, 255, 255, 0.95)" />
+              <circle cx="0" cy="0" r="2.8" fill="#FFFFFF" />
+            </svg>
+          </div>
+        )}
       </div>
 
       {/* 3. Ngày cưới (Trang trọng, font Serif cổ điển - Rõ ràng, nổi bật) */}
