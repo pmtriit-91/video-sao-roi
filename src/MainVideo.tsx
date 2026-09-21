@@ -78,14 +78,14 @@ export const MainVideo: React.FC<MainVideoProps> = ({
         loopDurationFrames={config.loopDurationFrames}
       />
 
-      {/* Layer 5: Định danh trung tâm (Tạm tắt để tránh nhiễu theo chỉ thị) */}
-      {/* <CenterTypography
+      {/* Layer 5: Định danh trung tâm (Monogram, Tên dâu rể, Ngày cưới) */}
+      <CenterTypography
         config={config}
         palette={palette}
         width={width}
         height={height}
         loopDurationFrames={config.loopDurationFrames}
-      /> */}
+      />
     </div>
   );
 };
