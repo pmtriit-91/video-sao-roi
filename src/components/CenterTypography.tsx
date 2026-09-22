@@ -52,6 +52,45 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
     ? Math.sin(nameProgress * Math.PI)
     : 0;
 
+  // Kiểm tra chủ đề cưới để đồng bộ màu sắc typography
+  const isGold = config.theme === "champagneGold";
+  const isRose = config.theme === "roseGold";
+  const isSapphire = config.theme === "midnightSapphire";
+
+  // Gradient chữ "Vàng Trắng hoàng gia" (hoặc pha màu chủ đề) sang trọng, quý phái
+  const typographyGradient = isGold
+    ? "linear-gradient(180deg, #FFFFFF 0%, #FFF7E4 32%, #F6DF9C 68%, #D4A853 100%)"
+    : isRose
+    ? "linear-gradient(180deg, #FFFFFF 0%, #FFF2F4 32%, #F6CCD4 68%, #D89AA7 100%)"
+    : isSapphire
+    ? "linear-gradient(180deg, #FFFFFF 0%, #F0F9FF 32%, #BAE6FD 68%, #60A5FA 100%)"
+    : "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 35%, #E2E8F0 72%, #CBD5E1 100%)";
+
+  // Gradient chữ ngày tháng: tăng tỷ lệ sáng trắng vàng (luminous champagne white-gold) để nét chữ thanh mảnh vẫn rõ ràng, bắt mắt
+  const dateGradient = isGold
+    ? "linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 40%, #FFF4D2 72%, #F5D380 100%)"
+    : isRose
+    ? "linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 40%, #FFE8EE 72%, #F6BDCB 100%)"
+    : isSapphire
+    ? "linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 40%, #E0F2FE 72%, #93C5FD 100%)"
+    : "linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 45%, #F1F5F9 75%, #E2E8F0 100%)";
+
+  const typographyGlow = isGold
+    ? "rgba(240, 210, 130, 0.45)"
+    : isRose
+    ? "rgba(251, 113, 133, 0.40)"
+    : isSapphire
+    ? "rgba(96, 165, 250, 0.42)"
+    : (palette.textGlow || "rgba(255, 255, 255, 0.35)");
+
+  const dateGlow = isGold
+    ? "rgba(255, 235, 175, 0.55)"
+    : isRose
+    ? "rgba(254, 205, 211, 0.50)"
+    : isSapphire
+    ? "rgba(186, 230, 253, 0.50)"
+    : typographyGlow;
+
   return (
     <div
       style={{
@@ -187,11 +226,6 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
             const glint5 = makeGlint(60, 78);
             // 6. Đuôi lượn chữ T góc dưới phải (760, 520)
             const glint6 = makeGlint(66, 84);
-
-            // Kiểm tra chủ đề cưới
-            const isGold = config.theme === "champagneGold";
-            const isRose = config.theme === "roseGold";
-            const isSapphire = config.theme === "midnightSapphire";
 
             return (
               <svg
@@ -432,19 +466,21 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
           textAlign: "center",
         }}
       >
-        {/* Layer 1: Nét chữ gốc - sắc nét 100%, không bị nhòe blur, tương phản nổi bật */}
+        {/* Layer 1: Nét chữ gốc - gradient Vàng Trắng hoàng gia, sắc nét 100%, không bị nhòe blur */}
         <div
           style={{
             fontFamily: "'Great Vibes', 'Alex Brush', cursive",
             fontSize: width * 0.052, // Tự động co giãn theo 2K (133px) hoặc 4K (200px)
-            color: "#FFFFFF",
+            backgroundImage: typographyGradient,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
             letterSpacing: "0.02em",
             lineHeight: 1.25,
             textAlign: "center",
-            textShadow: `
-              0 2px 6px rgba(0, 0, 0, 0.85),
-              0 4px 16px rgba(0, 0, 0, 0.7),
-              0 0 16px ${palette.textGlow || "rgba(255, 255, 255, 0.25)"}
+            filter: `
+              drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95))
+              drop-shadow(0 4px 14px rgba(0, 0, 0, 0.8))
+              drop-shadow(0 0 16px ${typographyGlow})
             `,
             opacity: 1,
             WebkitFontSmoothing: "antialiased",
@@ -518,21 +554,23 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
         )}
       </div>
 
-      {/* 3. Ngày cưới (Trang trọng, font Serif cổ điển - Rõ ràng, nổi bật) */}
+      {/* 3. Ngày cưới (Trang trọng, font Serif cổ điển - Màu Vàng Trắng rực rỡ, rõ nét) */}
       <div
         style={{
           marginTop: height * 0.024,
           fontFamily: "'Cormorant Garamond', 'Cinzel', 'Playfair Display', serif",
           fontSize: width * 0.022, // Tăng kích thước: ~56px ở 2K, ~90px ở 4K rõ ràng, trang trọng
-          fontWeight: 600,
-          color: "#FFFFFF",
+          fontWeight: 650,
           letterSpacing: "0.22em",
           textAlign: "center",
-          textShadow: `
-            0 2px 6px rgba(0, 0, 0, 0.85),
-            0 0 14px ${palette.textGlow || "rgba(255, 255, 255, 0.25)"}
+          backgroundImage: dateGradient,
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          filter: `
+            drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95))
+            drop-shadow(0 0 14px ${dateGlow})
           `,
-          opacity: 0.96 * glowBreath,
+          opacity: 1,
           WebkitFontSmoothing: "antialiased",
           MozOsxFontSmoothing: "grayscale",
           textRendering: "optimizeLegibility",
