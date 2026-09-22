@@ -6,6 +6,19 @@ import { MainVideo } from "./MainVideo";
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      {/* Composition Full HD 1080p (1920 x 1080 @ 60fps) - Chuẩn tương thích 100% mọi màn chiếu, TV & đầu cắm USB */}
+      <Composition
+        id="StarFall1080p"
+        component={MainVideo}
+        durationInFrames={starConfig.loopDurationFrames}
+        fps={60}
+        width={1920}
+        height={1080}
+        defaultProps={{
+          config: starConfig,
+        }}
+      />
+
       {/* Composition 2K QHD (2560 x 1440 @ 60fps) - Chuẩn tối ưu cho màn LED hội trường */}
       <Composition
         id="StarFall2K"

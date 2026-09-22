@@ -6,6 +6,7 @@
   "scripts": {
     "start": "remotion studio",
     "build": "remotion render StarFall2K out/sao-roi-2k.mp4 --concurrency=100% --gl=angle",
+    "render:1080p": "remotion render StarFall1080p out/sao-roi-1080p.mp4 --concurrency=100% --crf=18 --gl=angle",
     "render:2k": "remotion render StarFall2K out/sao-roi-2k.mp4 --concurrency=100% --crf=18 --gl=angle",
     "render:4k": "remotion render StarFall4K out/sao-roi-4k.mp4 --concurrency=100% --crf=18 --gl=angle"
   },

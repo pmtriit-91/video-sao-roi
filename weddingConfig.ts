@@ -31,6 +31,8 @@
  *     - "midnightSapphire": Xanh Sapphire Dạ Yến (huyền bí, điện ảnh)
  *
  *  5. XUẤT FILE VIDEO THÀNH PHẨM (RENDER MP4):
+ *     - Bản Full HD 1080p (1920 x 1080 @ 60fps - Tương thích 100% mọi màn chiếu, TV & đầu cắm USB):
+ *         npm run render:1080p
  *     - Bản 2K QHD (2560 x 1440 @ 60fps - Chuẩn nét căng cho hội trường tiệc cưới):
  *         npm run render:2k
  *     - Bản 4K UHD (3840 x 2160 @ 60fps - Chuẩn siêu nét cho màn LED P2 / P3 cỡ lớn):
@@ -64,11 +66,11 @@ export interface WeddingClientConfig {
  */
 export const weddingClientConfig: WeddingClientConfig = {
     // 1. Tên cặp đôi
-    brideName: 'Cẩm Hương',
-    groomName: 'Minh Trí',
+    brideName: 'Minh Trí',
+    groomName: 'Cẩm Hương',
 
     // 2. Ngày tổ chức hôn lễ
-    weddingDate: '27.09.2026',
+    weddingDate: '29.09.2026',
 
     // 3. Logo định danh
     // - Chọn "builtInHT" nếu muốn dùng logo monogram hoàng gia H - T có sẵn
