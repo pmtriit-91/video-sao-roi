@@ -64,6 +64,9 @@ export const FloatingAmbientStarsThree: React.FC<FloatingAmbientStarsThreeProps>
 
   // 1. Khởi tạo quỹ đạo chuyển động 3D cho các hạt sáng đơn lẻ bay ngược chiều & tự do
   const { startPositions, endPositions, swayData, randomData, colors } = useMemo(() => {
+    const cPrimary = new THREE.Color(palette.primary);
+    const cSecondary = new THREE.Color(palette.secondary);
+
     const startPos = new Float32Array(count * 3);
     const endPos = new Float32Array(count * 3);
     const sway = new Float32Array(count * 4); // [swayAmpX, swayAmpY, swayFreq, swayPhase]
@@ -146,11 +149,15 @@ export const FloatingAmbientStarsThree: React.FC<FloatingAmbientStarsThreeProps>
       rnd[i * 4 + 2] = baseSize;
       rnd[i * 4 + 3] = sparkleSpeed;
 
-      // Sắc màu hạt phát quang kim cương sang trọng:
-      if (h6 > 0.6) {
-        col[i * 3 + 0] = 0.94;
-        col[i * 3 + 1] = 0.97;
-        col[i * 3 + 2] = 1.0;
+      // Sắc màu hạt phát quang kim cương sang trọng theo chủ đề tiệc cưới:
+      if (h6 > 0.55) {
+        col[i * 3 + 0] = cSecondary.r;
+        col[i * 3 + 1] = cSecondary.g;
+        col[i * 3 + 2] = cSecondary.b;
+      } else if (h6 > 0.25) {
+        col[i * 3 + 0] = cPrimary.r;
+        col[i * 3 + 1] = cPrimary.g;
+        col[i * 3 + 2] = cPrimary.b;
       } else {
         col[i * 3 + 0] = 1.0;
         col[i * 3 + 1] = 1.0;
@@ -165,7 +172,7 @@ export const FloatingAmbientStarsThree: React.FC<FloatingAmbientStarsThreeProps>
       randomData: rnd,
       colors: col,
     };
-  }, [count]);
+  }, [count, palette.primary, palette.secondary]);
 
   // 2. Three.js Scene Setup
   useEffect(() => {

@@ -151,8 +151,7 @@ export const StageBeamsThree: React.FC<StageBeamsThreeProps> = ({
 
     containerRef.current.innerHTML = "";
     containerRef.current.appendChild(renderer.domElement);
-
-    const beamBaseColor = new THREE.Color(0.86, 0.93, 1.0);
+    const beamBaseColor = new THREE.Color(palette.secondary || "#93C5FD");
 
     const material = new THREE.ShaderMaterial({
       uniforms: {
@@ -262,7 +261,7 @@ export const StageBeamsThree: React.FC<StageBeamsThreeProps> = ({
       renderer.dispose();
       material.dispose();
     };
-  }, [width, height, geometry]);
+  }, [width, height, geometry, palette.secondary]);
 
   useEffect(() => {
     if (materialRef.current) {

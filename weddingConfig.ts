@@ -64,11 +64,11 @@ export interface WeddingClientConfig {
  */
 export const weddingClientConfig: WeddingClientConfig = {
     // 1. Tên cặp đôi
-    brideName: 'Minh Trí',
-    groomName: 'Cẩm Hương',
+    brideName: 'Cẩm Hương',
+    groomName: 'Minh Trí',
 
     // 2. Ngày tổ chức hôn lễ
-    weddingDate: '29.09.2026',
+    weddingDate: '27.09.2026',
 
     // 3. Logo định danh
     // - Chọn "builtInHT" nếu muốn dùng logo monogram hoàng gia H - T có sẵn
@@ -77,5 +77,5 @@ export const weddingClientConfig: WeddingClientConfig = {
     customLogoPath: '', // Ví dụ: "logos/logo-khach.png" (file đặt trong thư mục public/logos/)
 
     // 4. Tông màu chủ đạo
-    theme: 'silverDiamond',
+    theme: 'midnightSapphire',
 };

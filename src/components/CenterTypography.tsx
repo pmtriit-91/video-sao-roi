@@ -191,6 +191,7 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
             // Kiểm tra chủ đề cưới
             const isGold = config.theme === "champagneGold";
             const isRose = config.theme === "roseGold";
+            const isSapphire = config.theme === "midnightSapphire";
 
             return (
               <svg
@@ -201,7 +202,7 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <defs>
-                  {/* Gradient kim loại nền logo (GIỮ NGUYÊN TUYỆT ĐỐI THEO YÊU CẦU NGƯỜI DÙNG) */}
+                  {/* Gradient kim loại nền logo */}
                   <linearGradient id="monogramMetallic" x1="0%" y1="0%" x2="20%" y2="100%">
                     {isGold ? (
                       <>
@@ -218,6 +219,14 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
                         <stop offset="55%" stopColor="#D89AA7" />
                         <stop offset="85%" stopColor="#AC6D7B" />
                         <stop offset="100%" stopColor="#8E525F" />
+                      </>
+                    ) : isSapphire ? (
+                      <>
+                        <stop offset="0%" stopColor="#FFFFFF" />
+                        <stop offset="25%" stopColor="#E0F2FE" />
+                        <stop offset="55%" stopColor="#93C5FD" />
+                        <stop offset="85%" stopColor="#60A5FA" />
+                        <stop offset="100%" stopColor="#2563EB" />
                       </>
                     ) : (
                       /* Bạch kim / Bạc kim cương sáng trong (Bright Diamond Platinum) nguyên bản */
@@ -435,7 +444,7 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
             textShadow: `
               0 2px 6px rgba(0, 0, 0, 0.85),
               0 4px 16px rgba(0, 0, 0, 0.7),
-              0 0 16px rgba(255, 255, 255, 0.25)
+              0 0 16px ${palette.textGlow || "rgba(255, 255, 255, 0.25)"}
             `,
             opacity: 1,
             WebkitFontSmoothing: "antialiased",
@@ -521,7 +530,7 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
           textAlign: "center",
           textShadow: `
             0 2px 6px rgba(0, 0, 0, 0.85),
-            0 0 12px rgba(255, 255, 255, 0.25)
+            0 0 14px ${palette.textGlow || "rgba(255, 255, 255, 0.25)"}
           `,
           opacity: 0.96 * glowBreath,
           WebkitFontSmoothing: "antialiased",

@@ -53,6 +53,9 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
 
     // 1. Phối cảnh 3D Đĩa Sàn Sao Ngang (Horizontal Perspective Floor Disc) đối xứng với Trần sao
     const { positions, randomData, colors, sparkles } = useMemo(() => {
+        const cPrimary = new THREE.Color(palette.primary);
+        const cSecondary = new THREE.Color(palette.secondary);
+
         const pos = new Float32Array(count * 3);
         const rnd = new Float32Array(count * 4); // [twinkleSpeed, phase, baseSize, driftAmp]
         const col = new Float32Array(count * 3);
@@ -141,24 +144,29 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
             rnd[i * 4 + 2] = baseSize;
             rnd[i * 4 + 3] = twinklePhase;
 
-            // Tông màu & Quang thông:
+            // Tông màu & Quang thông theo chủ đề tiệc cưới:
             const edgeFade = Math.max(0.12, Math.cos(normX * (Math.PI * 0.46)));
             const brightness = 1.15 * edgeFade;
 
             const colRand = (((Math.sin(i * 723.1 + 84.2) * 19283.4) % 1) + 1) % 1;
-            if (colRand > 0.7) {
-                col[i * 3 + 0] = 0.9 * brightness;
-                col[i * 3 + 1] = 0.96 * brightness;
-                col[i * 3 + 2] = 1.0 * brightness;
-            } else {
-                col[i * 3 + 0] = 1.0 * brightness;
-                col[i * 3 + 1] = 1.0 * brightness;
-                col[i * 3 + 2] = 1.0 * brightness;
+            let cr = 1.0, cg = 1.0, cb = 1.0;
+            if (colRand > 0.55) {
+                cr = cSecondary.r;
+                cg = cSecondary.g;
+                cb = cSecondary.b;
+            } else if (colRand > 0.2) {
+                cr = cPrimary.r;
+                cg = cPrimary.g;
+                cb = cPrimary.b;
             }
+
+            col[i * 3 + 0] = cr * brightness;
+            col[i * 3 + 1] = cg * brightness;
+            col[i * 3 + 2] = cb * brightness;
         }
 
         return { positions: pos, randomData: rnd, colors: col, sparkles };
-    }, [count]);
+    }, [count, palette.primary, palette.secondary]);
 
     // 2. Khởi tạo Three.js
     useEffect(() => {
