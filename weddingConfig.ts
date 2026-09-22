@@ -77,5 +77,5 @@ export const weddingClientConfig: WeddingClientConfig = {
     customLogoPath: '', // Ví dụ: "logos/logo-khach.png" (file đặt trong thư mục public/logos/)
 
     // 4. Tông màu chủ đạo
-    theme: 'midnightSapphire',
+    theme: 'champagneGold',
 };
