@@ -74,6 +74,15 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
     ? "rgba(96, 165, 250, 0.42)"
     : (palette.textGlow || "rgba(255, 255, 255, 0.35)");
 
+  // 2. Màu chữ ngày tháng: Đồng bộ tinh tế với Tên dâu rể, tăng sáng nhẹ phần chân chữ để rõ nét tự nhiên
+  const dateGradient = isGold
+    ? "linear-gradient(180deg, #FFFFFF 0%, #FFF9E8 30%, #F9E4A6 65%, #E2BC68 100%)"
+    : isRose
+    ? "linear-gradient(180deg, #FFFFFF 0%, #FFF6F8 30%, #FADCE3 65%, #E5A8B5 100%)"
+    : isSapphire
+    ? "linear-gradient(180deg, #FFFFFF 0%, #F0F9FF 30%, #C7EAFF 65%, #7AB8FB 100%)"
+    : "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 35%, #E8EEF5 70%, #CBD5E1 100%)";
+
   return (
     <div
       style={{
@@ -150,7 +159,7 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
                   />
                 )}
 
-                {/* Điểm sao kim cương lướt theo luồng sáng trên logo */}
+                {/* Điểm sáng tròn lướt theo luồng sáng trên logo */}
                 {isLogoSweeping && logoGlintIntensity > 0.05 && (
                   <div
                     style={{
@@ -163,13 +172,11 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
                     }}
                   >
                     <svg width="44" height="44" viewBox="-22 -22 44 44" fill="none">
-                      <circle cx="0" cy="0" r="15" fill="rgba(255, 255, 255, 0.35)" />
-                      <circle cx="0" cy="0" r="7.5" fill="rgba(255, 255, 255, 0.8)" />
-                      <polygon points="-26,0 0,-1.8 26,0 0,1.8" fill="#FFFFFF" />
-                      <polygon points="0,-26 -1.8,0 0,26 1.8,0" fill="#FFFFFF" />
-                      <polygon points="-10,-10 0,-1.2 10,10 0,1.2" fill="rgba(255, 255, 255, 0.95)" />
-                      <polygon points="-10,10 -1.2,0 10,-10 1.2,0" fill="rgba(255, 255, 255, 0.95)" />
-                      <circle cx="0" cy="0" r="2.8" fill="#FFFFFF" />
+                      <circle cx="0" cy="0" r="18" fill="rgba(255, 255, 255, 0.22)" />
+                      <circle cx="0" cy="0" r="13" stroke="rgba(255, 255, 255, 0.45)" strokeWidth="1" />
+                      <circle cx="0" cy="0" r="10" fill="rgba(255, 255, 255, 0.65)" />
+                      <circle cx="0" cy="0" r="5" fill="rgba(255, 255, 255, 0.95)" />
+                      <circle cx="0" cy="0" r="2.5" fill="#FFFFFF" />
                     </svg>
                   </div>
                 )}
@@ -333,7 +340,7 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
                   </g>
                 )}
 
-                {/* GIẢI PHÁP 3: 6 ĐIỂM LÓE SÁNG KIM CƯƠNG TRẮNG TINH (PURE WHITE GLINT HIGHLIGHTS) */}
+                {/* GIẢI PHÁP 3: 6 ĐIỂM SÁNG TRÒN TỎA LẤP LÁNH LONG LANH (CIRCULAR SPARKLE BLOOMS) */}
                 {/* 1. Chóp serif chữ H trái (200, 80) */}
                 {glint1.active && (
                   <g
@@ -341,13 +348,11 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
                     opacity={glint1.intensity * 1.0}
                     style={{ pointerEvents: "none" }}
                   >
-                    <circle cx="0" cy="0" r="22" fill="rgba(255, 255, 255, 0.35)" />
-                    <circle cx="0" cy="0" r="11" fill="rgba(255, 255, 255, 0.75)" />
-                    <polygon points="-36,0 0,-2.2 36,0 0,2.2" fill="#FFFFFF" />
-                    <polygon points="0,-36 -2.2,0 0,36 2.2,0" fill="#FFFFFF" />
-                    <polygon points="-14,-14 0,-1.5 14,14 0,1.5" fill="rgba(255, 255, 255, 0.95)" />
-                    <polygon points="-14,14 -1.5,0 14,-14 1.5,0" fill="rgba(255, 255, 255, 0.95)" />
-                    <circle cx="0" cy="0" r="4" fill="#FFFFFF" />
+                    <circle cx="0" cy="0" r="28" fill="rgba(255, 255, 255, 0.22)" />
+                    <circle cx="0" cy="0" r="18" stroke="rgba(255, 255, 255, 0.45)" strokeWidth="1.2" />
+                    <circle cx="0" cy="0" r="14" fill="rgba(255, 255, 255, 0.65)" />
+                    <circle cx="0" cy="0" r="7" fill="rgba(255, 255, 255, 0.95)" />
+                    <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
                   </g>
                 )}
 
@@ -358,13 +363,11 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
                     opacity={glint2.intensity * 0.95}
                     style={{ pointerEvents: "none" }}
                   >
-                    <circle cx="0" cy="0" r="20" fill="rgba(255, 255, 255, 0.3)" />
-                    <circle cx="0" cy="0" r="10" fill="rgba(255, 255, 255, 0.7)" />
-                    <polygon points="-30,0 0,-1.8 30,0 0,1.8" fill="#FFFFFF" />
-                    <polygon points="0,-30 -1.8,0 0,30 1.8,0" fill="#FFFFFF" />
-                    <polygon points="-12,-12 0,-1.2 12,12 0,1.2" fill="rgba(255, 255, 255, 0.9)" />
-                    <polygon points="-12,12 -1.2,0 12,-12 1.2,0" fill="rgba(255, 255, 255, 0.9)" />
-                    <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
+                    <circle cx="0" cy="0" r="24" fill="rgba(255, 255, 255, 0.20)" />
+                    <circle cx="0" cy="0" r="15" stroke="rgba(255, 255, 255, 0.40)" strokeWidth="1.2" />
+                    <circle cx="0" cy="0" r="12" fill="rgba(255, 255, 255, 0.60)" />
+                    <circle cx="0" cy="0" r="6" fill="rgba(255, 255, 255, 0.95)" />
+                    <circle cx="0" cy="0" r="3" fill="#FFFFFF" />
                   </g>
                 )}
 
@@ -375,13 +378,11 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
                     opacity={glint3.intensity * 1.0}
                     style={{ pointerEvents: "none" }}
                   >
-                    <circle cx="0" cy="0" r="28" fill="rgba(255, 255, 255, 0.45)" />
-                    <circle cx="0" cy="0" r="15" fill="rgba(255, 255, 255, 0.85)" />
-                    <polygon points="-48,0 0,-2.6 48,0 0,2.6" fill="#FFFFFF" />
-                    <polygon points="0,-48 -2.6,0 0,48 2.6,0" fill="#FFFFFF" />
-                    <polygon points="-19,-19 0,-2 19,19 0,2" fill="rgba(255, 255, 255, 0.95)" />
-                    <polygon points="-19,19 -2,0 19,-19 2,0" fill="rgba(255, 255, 255, 0.95)" />
-                    <circle cx="0" cy="0" r="5.5" fill="#FFFFFF" />
+                    <circle cx="0" cy="0" r="34" fill="rgba(255, 255, 255, 0.25)" />
+                    <circle cx="0" cy="0" r="22" stroke="rgba(255, 255, 255, 0.50)" strokeWidth="1.5" />
+                    <circle cx="0" cy="0" r="18" fill="rgba(255, 255, 255, 0.72)" />
+                    <circle cx="0" cy="0" r="9" fill="rgba(255, 255, 255, 0.98)" />
+                    <circle cx="0" cy="0" r="4.5" fill="#FFFFFF" />
                   </g>
                 )}
 
@@ -392,13 +393,11 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
                     opacity={glint4.intensity * 1.0}
                     style={{ pointerEvents: "none" }}
                   >
-                    <circle cx="0" cy="0" r="22" fill="rgba(255, 255, 255, 0.35)" />
-                    <circle cx="0" cy="0" r="11" fill="rgba(255, 255, 255, 0.75)" />
-                    <polygon points="-36,0 0,-2 36,0 0,2" fill="#FFFFFF" />
-                    <polygon points="0,-36 -2,0 0,36 2,0" fill="#FFFFFF" />
-                    <polygon points="-14,-14 0,-1.5 14,14 0,1.5" fill="rgba(255, 255, 255, 0.95)" />
-                    <polygon points="-14,14 -1.5,0 14,-14 1.5,0" fill="rgba(255, 255, 255, 0.95)" />
-                    <circle cx="0" cy="0" r="4" fill="#FFFFFF" />
+                    <circle cx="0" cy="0" r="28" fill="rgba(255, 255, 255, 0.22)" />
+                    <circle cx="0" cy="0" r="18" stroke="rgba(255, 255, 255, 0.45)" strokeWidth="1.2" />
+                    <circle cx="0" cy="0" r="14" fill="rgba(255, 255, 255, 0.65)" />
+                    <circle cx="0" cy="0" r="7" fill="rgba(255, 255, 255, 0.95)" />
+                    <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
                   </g>
                 )}
 
@@ -409,13 +408,11 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
                     opacity={glint5.intensity * 0.95}
                     style={{ pointerEvents: "none" }}
                   >
-                    <circle cx="0" cy="0" r="20" fill="rgba(255, 255, 255, 0.3)" />
-                    <circle cx="0" cy="0" r="10" fill="rgba(255, 255, 255, 0.7)" />
-                    <polygon points="-32,0 0,-1.8 32,0 0,1.8" fill="#FFFFFF" />
-                    <polygon points="0,-32 -1.8,0 0,32 1.8,0" fill="#FFFFFF" />
-                    <polygon points="-13,-13 0,-1.3 13,13 0,1.3" fill="rgba(255, 255, 255, 0.9)" />
-                    <polygon points="-13,13 -1.3,0 13,-13 1.3,0" fill="rgba(255, 255, 255, 0.9)" />
-                    <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
+                    <circle cx="0" cy="0" r="24" fill="rgba(255, 255, 255, 0.20)" />
+                    <circle cx="0" cy="0" r="15" stroke="rgba(255, 255, 255, 0.40)" strokeWidth="1.2" />
+                    <circle cx="0" cy="0" r="12" fill="rgba(255, 255, 255, 0.60)" />
+                    <circle cx="0" cy="0" r="6" fill="rgba(255, 255, 255, 0.95)" />
+                    <circle cx="0" cy="0" r="3" fill="#FFFFFF" />
                   </g>
                 )}
 
@@ -426,13 +423,11 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
                     opacity={glint6.intensity * 1.0}
                     style={{ pointerEvents: "none" }}
                   >
-                    <circle cx="0" cy="0" r="22" fill="rgba(255, 255, 255, 0.35)" />
-                    <circle cx="0" cy="0" r="11" fill="rgba(255, 255, 255, 0.75)" />
-                    <polygon points="-36,0 0,-2 36,0 0,2" fill="#FFFFFF" />
-                    <polygon points="0,-36 -2,0 0,36 2,0" fill="#FFFFFF" />
-                    <polygon points="-14,-14 0,-1.5 14,14 0,1.5" fill="rgba(255, 255, 255, 0.95)" />
-                    <polygon points="-14,14 -1.5,0 14,-14 1.5,0" fill="rgba(255, 255, 255, 0.95)" />
-                    <circle cx="0" cy="0" r="4" fill="#FFFFFF" />
+                    <circle cx="0" cy="0" r="28" fill="rgba(255, 255, 255, 0.22)" />
+                    <circle cx="0" cy="0" r="18" stroke="rgba(255, 255, 255, 0.45)" strokeWidth="1.2" />
+                    <circle cx="0" cy="0" r="14" fill="rgba(255, 255, 255, 0.65)" />
+                    <circle cx="0" cy="0" r="7" fill="rgba(255, 255, 255, 0.95)" />
+                    <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
                   </g>
                 )}
               </svg>
@@ -512,7 +507,7 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
           </div>
         )}
 
-        {/* Layer 3: Điểm sao kim cương (Diamond Glint) lướt nhẹ cùng luồng sáng trên dòng chữ */}
+        {/* Layer 3: Điểm sáng tròn lướt nhẹ cùng luồng sáng trên dòng chữ */}
         {isNameSweeping && nameGlintIntensity > 0.05 && (
           <div
             style={{
@@ -525,35 +520,34 @@ export const CenterTypography: React.FC<CenterTypographyProps> = ({
             }}
           >
             <svg width="44" height="44" viewBox="-22 -22 44 44" fill="none">
-              <circle cx="0" cy="0" r="15" fill="rgba(255, 255, 255, 0.35)" />
-              <circle cx="0" cy="0" r="7.5" fill="rgba(255, 255, 255, 0.8)" />
-              <polygon points="-26,0 0,-1.8 26,0 0,1.8" fill="#FFFFFF" />
-              <polygon points="0,-26 -1.8,0 0,26 1.8,0" fill="#FFFFFF" />
-              <polygon points="-10,-10 0,-1.2 10,10 0,1.2" fill="rgba(255, 255, 255, 0.95)" />
-              <polygon points="-10,10 -1.2,0 10,-10 1.2,0" fill="rgba(255, 255, 255, 0.95)" />
-              <circle cx="0" cy="0" r="2.8" fill="#FFFFFF" />
+              <circle cx="0" cy="0" r="18" fill="rgba(255, 255, 255, 0.22)" />
+              <circle cx="0" cy="0" r="13" stroke="rgba(255, 255, 255, 0.50)" strokeWidth="1" />
+              <circle cx="0" cy="0" r="9" fill="rgba(255, 255, 255, 0.75)" />
+              <circle cx="0" cy="0" r="4.5" fill="rgba(255, 255, 255, 0.98)" />
+              <circle cx="0" cy="0" r="2.2" fill="#FFFFFF" />
             </svg>
           </div>
         )}
       </div>
 
-      {/* 3. Ngày cưới (Trang trọng, font Serif cổ điển - Màu Trắng pha Vàng đồng bộ) */}
+      {/* 3. Ngày cưới (Trang trọng, font Serif cổ điển - Rõ nét, đồng bộ hài hòa với tên dâu rể) */}
       <div
         style={{
           marginTop: height * 0.024,
           fontFamily: "'Cormorant Garamond', 'Cinzel', 'Playfair Display', serif",
-          fontSize: width * 0.022, // Tăng kích thước: ~56px ở 2K, ~90px ở 4K rõ ràng, trang trọng
+          fontSize: width * 0.0215,
           fontWeight: 600,
           letterSpacing: "0.22em",
           textAlign: "center",
-          backgroundImage: typographyGradient,
+          backgroundImage: dateGradient,
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           filter: `
             drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95))
-            drop-shadow(0 0 14px ${typographyGlow})
+            drop-shadow(0 3px 12px rgba(0, 0, 0, 0.85))
+            drop-shadow(0 0 10px ${typographyGlow})
           `,
-          opacity: 0.96 * glowBreath,
+          opacity: 1,
           WebkitFontSmoothing: "antialiased",
           MozOsxFontSmoothing: "grayscale",
           textRendering: "optimizeLegibility",

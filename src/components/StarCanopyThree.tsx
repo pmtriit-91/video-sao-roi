@@ -36,7 +36,7 @@ function createCanopyDustSprite(): THREE.Texture {
     return texture;
 }
 
-// 2. Sprite ngôi sao tinh thể 4 cánh quang học điện ảnh (Cinematic 4-Point Star Flare - 256px HD)
+// 2. Sprite điểm sáng tròn tỏa lấp lánh long lanh (Sparkling Circular Star Bloom - 256px HD)
 function createCanopyStarFlareSprite(): THREE.Texture {
     const size = 256;
     const canvas = document.createElement('canvas');
@@ -47,91 +47,55 @@ function createCanopyStarFlareSprite(): THREE.Texture {
         const center = size / 2;
         ctx.clearRect(0, 0, size, size);
 
-        // 1. Quầng hào quang phát quang mềm mại hình tròn ở tâm (Diffuse Bloom Halo)
-        const haloGrad = ctx.createRadialGradient(center, center, 0, center, center, center * 0.68);
-        haloGrad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
-        haloGrad.addColorStop(0.08, 'rgba(255, 255, 255, 0.95)');
-        haloGrad.addColorStop(0.20, 'rgba(255, 248, 235, 0.58)');
-        haloGrad.addColorStop(0.42, 'rgba(255, 235, 200, 0.20)');
-        haloGrad.addColorStop(0.72, 'rgba(230, 210, 180, 0.03)');
-        haloGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
-        ctx.fillStyle = haloGrad;
+        // 1. Quầng tỏa sương phát quang mềm mại ngoài cùng (Outer Diffuse Shimmer Halo)
+        const outerGrad = ctx.createRadialGradient(center, center, 0, center, center, center * 0.95);
+        outerGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.45)');
+        outerGrad.addColorStop(0.25, 'rgba(255, 248, 230, 0.28)');
+        outerGrad.addColorStop(0.55, 'rgba(240, 225, 200, 0.10)');
+        outerGrad.addColorStop(0.85, 'rgba(220, 210, 190, 0.02)');
+        outerGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = outerGrad;
         ctx.fillRect(0, 0, size, size);
 
-        // 2. Tia sao kim cương 4 cánh chính (Primary Horizontal & Vertical Diffraction Spikes)
-        const rayLen = 120;
-        const rayHalfWidth = 13.0;
+        // 2. Quầng hào quang pha lê tròn sáng rực (Luminous Crystal Bloom Halo)
+        const bloomGrad = ctx.createRadialGradient(center, center, 0, center, center, center * 0.60);
+        bloomGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.95)');
+        bloomGrad.addColorStop(0.18, 'rgba(255, 252, 245, 0.82)');
+        bloomGrad.addColorStop(0.40, 'rgba(255, 245, 220, 0.46)');
+        bloomGrad.addColorStop(0.70, 'rgba(255, 235, 195, 0.15)');
+        bloomGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = bloomGrad;
+        ctx.fillRect(0, 0, size, size);
 
-        // Tia ngang
-        const hGrad = ctx.createLinearGradient(center - rayLen, center, center + rayLen, center);
-        hGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0)');
-        hGrad.addColorStop(0.22, 'rgba(255, 255, 255, 0.45)');
-        hGrad.addColorStop(0.50, 'rgba(255, 255, 255, 1.0)');
-        hGrad.addColorStop(0.78, 'rgba(255, 255, 255, 0.45)');
-        hGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0)');
-        ctx.fillStyle = hGrad;
+        // 3. Vành tán sắc ngọc trai / kim cương lấp lánh (Shimmering Prismatic Corona Ring)
+        const ringGrad = ctx.createRadialGradient(center, center, center * 0.22, center, center, center * 0.38);
+        ringGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0)');
+        ringGrad.addColorStop(0.5, 'rgba(255, 250, 235, 0.42)');
+        ringGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = ringGrad;
         ctx.beginPath();
-        ctx.moveTo(center - rayLen, center);
-        ctx.quadraticCurveTo(center, center - rayHalfWidth, center + rayLen, center);
-        ctx.quadraticCurveTo(center, center + rayHalfWidth, center - rayLen, center);
-        ctx.closePath();
+        ctx.arc(center, center, center * 0.38, 0, Math.PI * 2);
         ctx.fill();
 
-        // Tia dọc
-        const vGrad = ctx.createLinearGradient(center, center - rayLen, center, center + rayLen);
-        vGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0)');
-        vGrad.addColorStop(0.22, 'rgba(255, 255, 255, 0.45)');
-        vGrad.addColorStop(0.50, 'rgba(255, 255, 255, 1.0)');
-        vGrad.addColorStop(0.78, 'rgba(255, 255, 255, 0.45)');
-        vGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0)');
-        ctx.fillStyle = vGrad;
+        // 4. Lớp ngọc sáng long lanh trung tâm (Glistening Diamond Core Halo)
+        const innerGrad = ctx.createRadialGradient(center, center, 0, center, center, center * 0.22);
+        innerGrad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+        innerGrad.addColorStop(0.35, 'rgba(255, 255, 255, 0.96)');
+        innerGrad.addColorStop(0.70, 'rgba(255, 250, 240, 0.65)');
+        innerGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = innerGrad;
         ctx.beginPath();
-        ctx.moveTo(center, center - rayLen);
-        ctx.quadraticCurveTo(center - rayHalfWidth, center, center, center + rayLen);
-        ctx.quadraticCurveTo(center + rayHalfWidth, center, center, center - rayLen);
-        ctx.closePath();
+        ctx.arc(center, center, center * 0.22, 0, Math.PI * 2);
         ctx.fill();
 
-        // 3. Tia chéo 45 độ thanh mảnh (Diagonal Micro-facets / 8-point Facets)
-        const dLen = 58;
-        const dHalfWidth = 5.5;
-        ctx.save();
-        ctx.translate(center, center);
-        ctx.rotate(Math.PI / 4);
-        const dGrad = ctx.createLinearGradient(-dLen, 0, dLen, 0);
-        dGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0)');
-        dGrad.addColorStop(0.30, 'rgba(255, 255, 255, 0.35)');
-        dGrad.addColorStop(0.50, 'rgba(255, 255, 255, 0.90)');
-        dGrad.addColorStop(0.70, 'rgba(255, 255, 255, 0.35)');
-        dGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0)');
-        ctx.fillStyle = dGrad;
-
-        // Cánh chéo 1
-        ctx.beginPath();
-        ctx.moveTo(-dLen, 0);
-        ctx.quadraticCurveTo(0, -dHalfWidth, dLen, 0);
-        ctx.quadraticCurveTo(0, dHalfWidth, -dLen, 0);
-        ctx.closePath();
-        ctx.fill();
-
-        // Cánh chéo 2
-        ctx.beginPath();
-        ctx.moveTo(0, -dLen);
-        ctx.quadraticCurveTo(-dHalfWidth, 0, 0, dLen);
-        ctx.quadraticCurveTo(dHalfWidth, 0, 0, -dLen);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.restore();
-
-        // 4. Lõi sáng kim cương rực rỡ trắng tinh ở tâm (Pure Specular Core)
-        const coreGrad = ctx.createRadialGradient(center, center, 0, center, center, 9.5);
+        // 5. Lõi sáng kim cương rực rỡ trắng tinh ở tâm (Pure Specular Core)
+        const coreGrad = ctx.createRadialGradient(center, center, 0, center, center, 11);
         coreGrad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
         coreGrad.addColorStop(0.65, 'rgba(255, 255, 255, 0.98)');
         coreGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
         ctx.fillStyle = coreGrad;
         ctx.beginPath();
-        ctx.arc(center, center, 9.5, 0, Math.PI * 2);
+        ctx.arc(center, center, 11, 0, Math.PI * 2);
         ctx.fill();
     }
     const texture = new THREE.CanvasTexture(canvas);
@@ -143,7 +107,7 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
     palette,
     width = 2560,
     height = 1440,
-    count = 35000,
+    count = 18000,
     loopDurationFrames = 2400,
 }) => {
     const frame = useCurrentFrame();
@@ -168,9 +132,9 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
         const cPrimary = new THREE.Color(palette.primary);
         const cSecondary = new THREE.Color(palette.secondary);
 
-        // Số lượng hạt sao tinh thể 4 cánh chuẩn điện ảnh:
-        // Khoảng 380 hạt trong toàn bộ vòm trần để tại mỗi khung hình có khoảng 18-25 ngôi sao bừng nở tia 4 cánh đúng như video gốc
-        const glintCount = Math.min(380, Math.round(count * 0.012));
+        // Số lượng hạt sao lấp lánh tròn tỏa sáng chuẩn điện ảnh:
+        // Khoảng 360 hạt trong toàn bộ vòm trần để tại mỗi khung hình có khoảng 20-30 điểm sáng tròn bừng nở long lanh
+        const glintCount = Math.min(360, Math.max(200, Math.round(count * 0.02)));
         const dustCount = count - glintCount;
 
         const dPos = new Float32Array(dustCount * 3);
@@ -253,11 +217,11 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
                 const glintFreq = 2.0 + (gIdx % 7); // Freq 2..8
                 gSpk[gIdx] = glintFreq;
 
-                // Các hạt ở viền ngoài và rìa rủ xuống sân khấu: nở hoa thị to đẹp
+                // Các điểm sáng tròn ở viền ngoài và rìa rủ xuống sân khấu: nở hoa thị to tròn long lanh
                 const isFringe = r > 0.35 || isRear;
-                let baseSize = 5.5 + sizeRand * 5.0;
+                let baseSize = 7.5 + sizeRand * 6.0;
                 if (isFringe) {
-                    baseSize = 8.0 + sizeRand * 8.5;
+                    baseSize = 10.5 + sizeRand * 8.5;
                 }
 
                 gRnd[gIdx * 4 + 0] = flowSpeed;
@@ -275,8 +239,9 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
                 dPos[dIdx * 3 + 1] = y;
                 dPos[dIdx * 3 + 2] = z;
 
-                let baseSize = 2.4 + sizeRand * 2.6;
-                if (!isFlow) baseSize *= 1.15;
+                // Tăng kích thước điểm sao li ti ở vòm trên: đạt ~4.4px đến 9.0px, bằng hoặc lớn hơn sàn dưới
+                let baseSize = 4.4 + sizeRand * 4.6;
+                if (!isFlow) baseSize *= 1.18;
 
                 dRnd[dIdx * 4 + 0] = flowSpeed;
                 dRnd[dIdx * 4 + 1] = flowPhase;
@@ -371,6 +336,9 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
           float coreGlow = 1.0 + 0.55 * exp(-pow(distNorm / 0.35, 2.0));
           vec3 starColor = customColor * coreGlow;
 
+          float fringeScale = clamp((length(pos.xz - uCenter.xz) - 350.0) / 600.0, 0.0, 1.0);
+          sizeGrowth *= (1.0 + fringeScale * 0.35);
+
           vColor = starColor;
           vAlpha = alphaMult * alphaNorm;
 
@@ -398,7 +366,7 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
         const dustPoints = new THREE.Points(dustGeometry, dustMaterial);
         scene.add(dustPoints);
 
-        // 2. LAYER SAO TINH THỂ LẤP LÁNH 4 CÁNH (Star Flare Points - 10%)
+        // 2. LAYER ĐIỂM SÁNG TRÒN TỎA LẤP LÁNH LONG LANH (Circular Sparkling Star Points)
         const glintGeometry = new THREE.BufferGeometry();
         glintGeometry.setAttribute('position', new THREE.BufferAttribute(glintPositions, 3));
         glintGeometry.setAttribute('randomData', new THREE.BufferAttribute(glintRandomData, 4));
@@ -436,13 +404,13 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
           float fadeEdge = smoothstep(1.0, 0.85, progress);
           float alphaMult = fadeCenter * fadeEdge;
 
-          // Hiệu ứng chớp lóe tia 4 cánh đa tần số chuẩn Seamless Loop 100%
+          // Hiệu ứng chớp lóe điểm sáng tròn đa tần số chuẩn Seamless Loop 100%
           float glintFreq = sparkle;
           float wave = abs(sin(uLoopAngle * glintFreq + twinklePhase));
-          float flash = pow(wave, 5.0);
+          float flash = pow(wave, 4.0);
 
-          float sizeGrowth = 0.25 + flash * 3.2; // Khi nghỉ: hạt rất nhỏ, khi chớp: nở bung tia sao
-          float alphaNorm = 0.15 + flash * 2.8;
+          float sizeGrowth = 0.30 + flash * 2.8; // Khi nghỉ: điểm sáng nhỏ gọn, khi chớp: bung nở quầng sáng tròn long lanh
+          float alphaNorm = 0.22 + flash * 2.6;
 
           vec3 starColor = mix(customColor * 1.15, vec3(3.8, 3.8, 4.2), flash * 0.95);
 
@@ -451,7 +419,7 @@ export const StarCanopyThree: React.FC<StarCanopyThreeProps> = ({
 
           vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
           float calculatedSize = baseSize * sizeGrowth * (1350.0 / -mvPosition.z);
-          gl_PointSize = min(calculatedSize, 85.0); // Khóa trần 85px cho tia sao điện ảnh hoàn mỹ
+          gl_PointSize = min(calculatedSize, 95.0); // Khóa trần 95px cho điểm sáng tròn bung nở rực rỡ
           gl_Position = projectionMatrix * mvPosition;
         }
       `,

@@ -11,7 +11,7 @@ interface FloatingAmbientStarsThreeProps {
   loopDurationFrames?: number;
 }
 
-// Sprite hạt sao lấp lánh quang học mềm mại
+// Sprite điểm sáng tròn lấp lánh quang học mềm mại (Sparkling Circular Orb)
 function createFloatingStarTexture(): THREE.Texture {
   const size = 128;
   const canvas = document.createElement("canvas");
@@ -20,25 +20,35 @@ function createFloatingStarTexture(): THREE.Texture {
   const ctx = canvas.getContext("2d");
   if (ctx) {
     const center = size / 2;
-    // Lớp quầng hào quang tỏa rộng
-    const gradGlow = ctx.createRadialGradient(center, center, 0, center, center, center);
+    // 1. Lớp quầng hào quang tỏa rộng mềm mại
+    const gradGlow = ctx.createRadialGradient(center, center, 0, center, center, center * 0.95);
     gradGlow.addColorStop(0.0, "rgba(255, 255, 255, 1.0)");
-    gradGlow.addColorStop(0.12, "rgba(255, 255, 255, 0.95)");
-    gradGlow.addColorStop(0.28, "rgba(235, 245, 255, 0.65)");
-    gradGlow.addColorStop(0.55, "rgba(195, 225, 255, 0.22)");
+    gradGlow.addColorStop(0.15, "rgba(255, 255, 255, 0.92)");
+    gradGlow.addColorStop(0.32, "rgba(235, 245, 255, 0.58)");
+    gradGlow.addColorStop(0.60, "rgba(195, 225, 255, 0.18)");
     gradGlow.addColorStop(1.0, "rgba(0, 0, 0, 0)");
     ctx.fillStyle = gradGlow;
     ctx.fillRect(0, 0, size, size);
 
-    // Tia sáng chéo 4 cánh nhẹ nhàng ở tâm
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
-    ctx.lineWidth = 1.5;
+    // 2. Vành tán sắc pha lê tròn lấp lánh long lanh
+    const ringGrad = ctx.createRadialGradient(center, center, center * 0.22, center, center, center * 0.40);
+    ringGrad.addColorStop(0.0, "rgba(255, 255, 255, 0)");
+    ringGrad.addColorStop(0.5, "rgba(255, 252, 240, 0.40)");
+    ringGrad.addColorStop(1.0, "rgba(255, 255, 255, 0)");
+    ctx.fillStyle = ringGrad;
     ctx.beginPath();
-    ctx.moveTo(center, center - 28);
-    ctx.lineTo(center, center + 28);
-    ctx.moveTo(center - 28, center);
-    ctx.lineTo(center + 28, center);
-    ctx.stroke();
+    ctx.arc(center, center, center * 0.40, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 3. Tâm ngọc sáng trắng tinh khiết
+    const coreGrad = ctx.createRadialGradient(center, center, 0, center, center, 8);
+    coreGrad.addColorStop(0.0, "rgba(255, 255, 255, 1.0)");
+    coreGrad.addColorStop(0.7, "rgba(255, 255, 255, 0.95)");
+    coreGrad.addColorStop(1.0, "rgba(255, 255, 255, 0)");
+    ctx.fillStyle = coreGrad;
+    ctx.beginPath();
+    ctx.arc(center, center, 8, 0, Math.PI * 2);
+    ctx.fill();
   }
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;

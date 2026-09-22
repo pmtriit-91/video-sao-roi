@@ -60,9 +60,9 @@ export const starConfig: WeddingStarConfig = {
 
   // 2. Thông số kỹ thuật hệ thống đồ họa 3D Three.js (Đã tối ưu chuẩn, không cần thay đổi)
   loopDurationFrames: 2400, // 40 giây @ 60fps
-  canopyCount: 35000,  // 35,000 hạt bụi sao vòm trần
+  canopyCount: 18000,  // 18,000 hạt sao vòm trần (mật độ thoáng, sang trọng, thanh thoát)
   fallingCount: 140,   // Hạt sao băng rơi bồng bềnh
-  floorCount: 35000,   // 35,000 hạt thảm sàn sao 3D
+  floorCount: 42000,   // 42,000 hạt thảm sàn sao 3D (tăng nhẹ mật độ để cân đối với vòm trên)
   beamCount: 6,        // Số cột ánh sáng sân khấu
 
   // Vùng an toàn chữ ở giữa màn hình
