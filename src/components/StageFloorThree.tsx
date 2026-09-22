@@ -11,23 +11,128 @@ interface StageFloorThreeProps {
     loopDurationFrames?: number;
 }
 
-// Tạo sprite hạt sao phản chiếu sàn kim cương phát quang chuẩn quang học
-function createFloorStarSprite(): THREE.Texture {
-    const size = 64;
+// 1. Sprite hạt bụi sao nền mịn màng mềm mại (Creamy Stardust Bokeh - 128px)
+function createFloorDustSprite(): THREE.Texture {
+    const size = 128;
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
     const ctx = canvas.getContext('2d');
     if (ctx) {
         const center = size / 2;
-        const grad = ctx.createRadialGradient(center, center, 0, center, center, center);
+        ctx.clearRect(0, 0, size, size);
+        const grad = ctx.createRadialGradient(center, center, 0, center, center, center * 0.88);
         grad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
-        grad.addColorStop(0.16, 'rgba(255, 255, 255, 0.95)');
-        grad.addColorStop(0.38, 'rgba(230, 245, 255, 0.60)');
-        grad.addColorStop(0.68, 'rgba(180, 220, 255, 0.18)');
+        grad.addColorStop(0.15, 'rgba(255, 255, 255, 0.92)');
+        grad.addColorStop(0.35, 'rgba(245, 248, 255, 0.55)');
+        grad.addColorStop(0.65, 'rgba(215, 235, 255, 0.15)');
+        grad.addColorStop(0.90, 'rgba(180, 210, 255, 0.02)');
         grad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, size, size);
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+}
+
+// 2. Sprite ngôi sao tinh thể 4 cánh quang học điện ảnh (Cinematic 4-Point Star Flare - 256px HD)
+function createFloorStarFlareSprite(): THREE.Texture {
+    const size = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+        const center = size / 2;
+        ctx.clearRect(0, 0, size, size);
+
+        // 1. Quầng hào quang phát quang mềm mại hình tròn ở tâm (Diffuse Bloom Halo)
+        const haloGrad = ctx.createRadialGradient(center, center, 0, center, center, center * 0.68);
+        haloGrad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+        haloGrad.addColorStop(0.08, 'rgba(255, 255, 255, 0.95)');
+        haloGrad.addColorStop(0.20, 'rgba(255, 248, 235, 0.58)');
+        haloGrad.addColorStop(0.42, 'rgba(255, 235, 200, 0.20)');
+        haloGrad.addColorStop(0.72, 'rgba(230, 210, 180, 0.03)');
+        haloGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = haloGrad;
+        ctx.fillRect(0, 0, size, size);
+
+        // 2. Tia sao kim cương 4 cánh chính (Primary Horizontal & Vertical Diffraction Spikes)
+        const rayLen = 120;
+        const rayHalfWidth = 13.0;
+
+        // Tia ngang
+        const hGrad = ctx.createLinearGradient(center - rayLen, center, center + rayLen, center);
+        hGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0)');
+        hGrad.addColorStop(0.22, 'rgba(255, 255, 255, 0.45)');
+        hGrad.addColorStop(0.50, 'rgba(255, 255, 255, 1.0)');
+        hGrad.addColorStop(0.78, 'rgba(255, 255, 255, 0.45)');
+        hGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = hGrad;
+        ctx.beginPath();
+        ctx.moveTo(center - rayLen, center);
+        ctx.quadraticCurveTo(center, center - rayHalfWidth, center + rayLen, center);
+        ctx.quadraticCurveTo(center, center + rayHalfWidth, center - rayLen, center);
+        ctx.closePath();
+        ctx.fill();
+
+        // Tia dọc
+        const vGrad = ctx.createLinearGradient(center, center - rayLen, center, center + rayLen);
+        vGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0)');
+        vGrad.addColorStop(0.22, 'rgba(255, 255, 255, 0.45)');
+        vGrad.addColorStop(0.50, 'rgba(255, 255, 255, 1.0)');
+        vGrad.addColorStop(0.78, 'rgba(255, 255, 255, 0.45)');
+        vGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = vGrad;
+        ctx.beginPath();
+        ctx.moveTo(center, center - rayLen);
+        ctx.quadraticCurveTo(center - rayHalfWidth, center, center, center + rayLen);
+        ctx.quadraticCurveTo(center + rayHalfWidth, center, center, center - rayLen);
+        ctx.closePath();
+        ctx.fill();
+
+        // 3. Tia chéo 45 độ thanh mảnh (Diagonal Micro-facets / 8-point Facets)
+        const dLen = 58;
+        const dHalfWidth = 5.5;
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.rotate(Math.PI / 4);
+        const dGrad = ctx.createLinearGradient(-dLen, 0, dLen, 0);
+        dGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0)');
+        dGrad.addColorStop(0.30, 'rgba(255, 255, 255, 0.35)');
+        dGrad.addColorStop(0.50, 'rgba(255, 255, 255, 0.90)');
+        dGrad.addColorStop(0.70, 'rgba(255, 255, 255, 0.35)');
+        dGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = dGrad;
+
+        // Cánh chéo 1
+        ctx.beginPath();
+        ctx.moveTo(-dLen, 0);
+        ctx.quadraticCurveTo(0, -dHalfWidth, dLen, 0);
+        ctx.quadraticCurveTo(0, dHalfWidth, -dLen, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        // Cánh chéo 2
+        ctx.beginPath();
+        ctx.moveTo(0, -dLen);
+        ctx.quadraticCurveTo(-dHalfWidth, 0, 0, dLen);
+        ctx.quadraticCurveTo(dHalfWidth, 0, 0, -dLen);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+
+        // 4. Lõi sáng kim cương rực rỡ trắng tinh ở tâm (Pure Specular Core)
+        const coreGrad = ctx.createRadialGradient(center, center, 0, center, center, 9.5);
+        coreGrad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+        coreGrad.addColorStop(0.65, 'rgba(255, 255, 255, 0.98)');
+        coreGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
+        ctx.fillStyle = coreGrad;
+        ctx.beginPath();
+        ctx.arc(center, center, 9.5, 0, Math.PI * 2);
+        ctx.fill();
     }
     const texture = new THREE.CanvasTexture(canvas);
     texture.needsUpdate = true;
@@ -47,31 +152,47 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
     const sceneRef = useRef<THREE.Scene | null>(null);
     const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
     const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-    const materialRef = useRef<THREE.ShaderMaterial | null>(null);
+
+    const dustMaterialRef = useRef<THREE.ShaderMaterial | null>(null);
+    const glintMaterialRef = useRef<THREE.ShaderMaterial | null>(null);
 
     const loopAngle = (frame / loopDurationFrames) * Math.PI * 2;
 
-    // 1. Phối cảnh 3D Đĩa Sàn Sao Ngang (Horizontal Perspective Floor Disc) đối xứng với Trần sao
-    const { positions, randomData, colors, sparkles } = useMemo(() => {
+    // Phân tầng hệ thống hạt:
+    // - dustCount (90%): Thảm bụi sao nền mịn màng, bồng bềnh, tạo chiều sâu sân khấu
+    // - glintCount (10%): Các ngôi sao tinh thể 4 cánh lóe sáng long lanh như video gốc
+    const {
+        dustPositions, dustRandomData, dustColors,
+        glintPositions, glintRandomData, glintColors, glintSparkles
+    } = useMemo(() => {
         const cPrimary = new THREE.Color(palette.primary);
         const cSecondary = new THREE.Color(palette.secondary);
 
-        const pos = new Float32Array(count * 3);
-        const rnd = new Float32Array(count * 4); // [twinkleSpeed, phase, baseSize, driftAmp]
-        const col = new Float32Array(count * 3);
-        const sparkles = new Float32Array(count); // Tần số chớp của hạt lấp lánh mạnh (0: bình thường, 3..8: chớp lóe)
+        // Số lượng hạt sao tinh thể 4 cánh chuẩn điện ảnh:
+        // Khoảng 350 hạt trong toàn bộ quỹ đạo sàn để tại mỗi khung hình có khoảng 18-25 ngôi sao bừng nở tia 4 cánh đúng như video gốc
+        const glintCount = Math.min(360, Math.round(count * 0.012));
+        const dustCount = count - glintCount;
 
-        // Kích thước hình học đĩa sàn 3D:
-        // Thu nhỏ vừa phải (scale = 0.72) để sàn rộng hơn vòm trần, tạo bệ đỡ ánh sáng vững chãi
+        const dPos = new Float32Array(dustCount * 3);
+        const dRnd = new Float32Array(dustCount * 4);
+        const dCol = new Float32Array(dustCount * 3);
+
+        const gPos = new Float32Array(glintCount * 3);
+        const gRnd = new Float32Array(glintCount * 4);
+        const gCol = new Float32Array(glintCount * 3);
+        const gSpk = new Float32Array(glintCount);
+
         const scale = 0.68;
-        const floorY = -465; // Nâng nhẹ độ cao sàn để viền chân trời sàn đạt tỷ lệ chuẩn xác
-        const thicknessY = 50; // Độ dày mỏng phẳng phiu của mặt sàn phản chiếu
-        const centerZ = -80; // Tâm đĩa sàn
-        const radiusX = 1800 * scale; // Bán kính ngang (1224)
-        const radiusZ = 900 * scale; // Bán kính sâu (578)
+        const floorY = -465;
+        const thicknessY = 50;
+        const centerZ = -80;
+        const radiusX = 1800 * scale;
+        const radiusZ = 900 * scale;
+
+        let dIdx = 0;
+        let gIdx = 0;
 
         for (let i = 0; i < count; i++) {
-            // Hàm băm giả ngẫu nhiên xác định (deterministic PRNG)
             const h1 = (((Math.sin(i * 15.7891 + 43.123) * 43758.5453) % 1) + 1) % 1;
             const h2 = (((Math.sin(i * 87.2341 + 12.987) * 24634.6345) % 1) + 1) % 1;
             const h3 = (((Math.sin(i * 39.4567 + 91.345) * 58392.1234) % 1) + 1) % 1;
@@ -79,72 +200,33 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
             const h5 = (((Math.sin(i * 28.9876 + 73.219) * 51829.4123) % 1) + 1) % 1;
 
             const theta = h1 * Math.PI * 2;
-            const isFlow = i % 2 === 0; // 50% hạt nền tĩnh êm ả làm bệ đỡ thị giác, 50% hạt trôi thong thả
+            const isFlow = i % 2 === 0;
 
             let r: number;
             let flowSpeed: number;
 
             if (!isFlow) {
-                // Hạt vùng lõi & trung tâm: phân bố lũy thừa tạo đĩa sáng tâm rực rỡ
                 r = Math.pow(h2, 1.25);
-                flowSpeed = 2; // Nhân đôi cho video 40s để giữ nguyên 100% vận tốc lan tỏa
+                flowSpeed = 2;
             } else {
-                // Hạt vươn rộng ra toàn sàn
                 r = 0.2 + 0.85 * Math.pow(h2, 0.95);
                 flowSpeed = i % 4 === 0 ? 4 : 2;
             }
 
-            // Trục hoành X và trục sâu Z của đích đến lan tỏa:
             const x = Math.cos(theta) * r * radiusX;
             const z = centerZ + Math.sin(theta) * r * radiusZ;
             const normX = Math.abs(x) / radiusX;
 
-            // Độ cao Y (Mặt phẳng sàn phẳng phiu, các hạt dao động cực nhẹ):
             let y = floorY + (h4 - 0.5) * thicknessY;
-
-            // Tán xạ nhẹ bốc lên khỏi mặt sàn ở vùng trung tâm (hiệu ứng sương phản quang):
             const isCenterArea = normX < 0.42 && r < 0.65;
             if (isCenterArea && h3 > 0.7) {
                 y += Math.pow(h5, 1.6) * 45;
             }
 
-            pos[i * 3 + 0] = x;
-            pos[i * 3 + 1] = y;
-            pos[i * 3 + 2] = z;
-
-            // Kích thước quang học 2K/4K:
             const sizeRand = (((Math.sin(i * 317.11 + 61.4) * 43758.54) % 1) + 1) % 1;
-            let baseSize = 2.4 + sizeRand * 2.8;
-
-            if (!isFlow) {
-                baseSize *= 1.1; // Hạt nền ổn định, sáng rõ
-            }
-
-            // Hạt sao kim cương lóe sáng trên sàn
-            if (sizeRand > 0.8 && sizeRand <= 0.95) {
-                baseSize = 6.5 + (sizeRand - 0.8) * 16.0;
-            } else if (sizeRand > 0.95) {
-                baseSize = 18.0 + (sizeRand - 0.95) * 65.0; // Tinh thể lóa sáng
-            }
-
-            // Điểm xuyết ~2% hạt lấp lánh mạnh (mật độ thưa, ngẫu nhiên khắp sàn)
-            const isSparkle = i % 45 === 0;
-            let sparkleSpeed = 0;
-            if (isSparkle) {
-                sparkleSpeed = 3 + (i % 6); // Chu kỳ chớp số nguyên (3..8) để Seamless Loop 100%
-                baseSize = Math.max(baseSize, 6.0 + sizeRand * 5.0);
-            }
-            sparkles[i] = sparkleSpeed;
-
             const flowPhase = (((h3 + i / count) % 1) + 1) % 1;
             const twinklePhase = (i * 2.399) % (Math.PI * 2);
 
-            rnd[i * 4 + 0] = flowSpeed;
-            rnd[i * 4 + 1] = flowPhase;
-            rnd[i * 4 + 2] = baseSize;
-            rnd[i * 4 + 3] = twinklePhase;
-
-            // Tông màu & Quang thông theo chủ đề tiệc cưới:
             const edgeFade = Math.max(0.12, Math.cos(normX * (Math.PI * 0.46)));
             const brightness = 1.15 * edgeFade;
 
@@ -160,15 +242,66 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
                 cb = cPrimary.b;
             }
 
-            col[i * 3 + 0] = cr * brightness;
-            col[i * 3 + 1] = cg * brightness;
-            col[i * 3 + 2] = cb * brightness;
+            const isGlint = (i % 10 === 0) && gIdx < glintCount;
+
+            if (isGlint) {
+                gPos[gIdx * 3 + 0] = x;
+                gPos[gIdx * 3 + 1] = y;
+                gPos[gIdx * 3 + 2] = z;
+
+                // Tần số chớp số nguyên đa dạng (Seamless Loop 100%)
+                const glintFreq = 2.0 + (gIdx % 7); // 2, 3, 4, 5, 6, 7, 8
+                gSpk[gIdx] = glintFreq;
+
+                // Kích thước sao tinh thể 4 cánh
+                const isForeground = z > -20 && r > 0.32;
+                let baseSize = 5.5 + sizeRand * 5.5;
+                if (isForeground) {
+                    baseSize = 8.5 + sizeRand * 9.5; // Sao tiền cảnh to đẹp, nở tia rõ rệt
+                }
+
+                gRnd[gIdx * 4 + 0] = flowSpeed;
+                gRnd[gIdx * 4 + 1] = flowPhase;
+                gRnd[gIdx * 4 + 2] = baseSize;
+                gRnd[gIdx * 4 + 3] = twinklePhase;
+
+                gCol[gIdx * 3 + 0] = cr * brightness * 1.1;
+                gCol[gIdx * 3 + 1] = cg * brightness * 1.1;
+                gCol[gIdx * 3 + 2] = cb * brightness * 1.1;
+
+                gIdx++;
+            } else if (dIdx < dustCount) {
+                dPos[dIdx * 3 + 0] = x;
+                dPos[dIdx * 3 + 1] = y;
+                dPos[dIdx * 3 + 2] = z;
+
+                let baseSize = 2.2 + sizeRand * 2.6;
+                if (!isFlow) baseSize *= 1.15;
+
+                dRnd[dIdx * 4 + 0] = flowSpeed;
+                dRnd[dIdx * 4 + 1] = flowPhase;
+                dRnd[dIdx * 4 + 2] = baseSize;
+                dRnd[dIdx * 4 + 3] = twinklePhase;
+
+                dCol[dIdx * 3 + 0] = cr * brightness;
+                dCol[dIdx * 3 + 1] = cg * brightness;
+                dCol[dIdx * 3 + 2] = cb * brightness;
+
+                dIdx++;
+            }
         }
 
-        return { positions: pos, randomData: rnd, colors: col, sparkles };
-    }, [count, palette.primary, palette.secondary]);
+        return {
+            dustPositions: dPos,
+            dustRandomData: dRnd,
+            dustColors: dCol,
+            glintPositions: gPos,
+            glintRandomData: gRnd,
+            glintColors: gCol,
+            glintSparkles: gSpk,
+        };
+    }, [count, palette]);
 
-    // 2. Khởi tạo Three.js
     useEffect(() => {
         if (!containerRef.current) return;
 
@@ -193,18 +326,17 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
         containerRef.current.innerHTML = '';
         containerRef.current.appendChild(renderer.domElement);
 
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('randomData', new THREE.BufferAttribute(randomData, 4));
-        geometry.setAttribute('customColor', new THREE.BufferAttribute(colors, 3));
-        geometry.setAttribute('sparkle', new THREE.BufferAttribute(sparkles, 1));
+        // 1. TẠO LAYER BỤI SAO NỀN (Dust Points - 90%)
+        const dustGeometry = new THREE.BufferGeometry();
+        dustGeometry.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
+        dustGeometry.setAttribute('randomData', new THREE.BufferAttribute(dustRandomData, 4));
+        dustGeometry.setAttribute('customColor', new THREE.BufferAttribute(dustColors, 3));
 
-        const starTexture = createFloorStarSprite();
-
-        const material = new THREE.ShaderMaterial({
+        const dustTexture = createFloorDustSprite();
+        const dustMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 uLoopAngle: { value: 0 },
-                uPointTexture: { value: starTexture },
+                uPointTexture: { value: dustTexture },
                 uCenter: { value: new THREE.Vector3(0, -465, -80) },
             },
             vertexShader: `
@@ -212,7 +344,6 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
         uniform vec3 uCenter;
         attribute vec4 randomData;
         attribute vec3 customColor;
-        attribute float sparkle;
         varying vec3 vColor;
         varying float vAlpha;
 
@@ -222,40 +353,26 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
           float baseSize = randomData.z;
           float twinklePhase = randomData.w;
 
-          // 1. Dòng chảy lan tỏa 100% từ tâm ra ngoài (Pure Radial Outward Flow), Seamless Loop 100%
-          float progress = fract(flowPhase + (uLoopAngle / 6.283185307) * flowSpeed);
-          float rNorm = pow(progress, 0.95);
+          float progress = fract(flowPhase + uLoopAngle * flowSpeed / (6.28318530718));
+          float rNorm = sqrt(progress);
 
           vec3 pos = mix(uCenter, position, rNorm);
 
-          // Nhịp nhấp nháy êm dịu, không giật chớp loạn mắt (nhân đôi tần số cho video 40s)
           float twinkleFreq = (1.0 + mod(twinklePhase, 2.0)) * 2.0;
           float twinkle = sin(uLoopAngle * twinkleFreq + twinklePhase);
-          float alphaNorm = 0.70 + 0.30 * twinkle;
+          float alphaNorm = 0.55 + 0.45 * twinkle;
 
-          // Fade-in mềm ở tâm và Fade-out mượt ở rìa ngoài
           float fadeCenter = smoothstep(0.0, 0.05, progress);
           float fadeEdge = smoothstep(1.0, 0.82, progress);
           float alphaMult = fadeCenter * fadeEdge;
           float sizeGrowth = smoothstep(0.0, 0.08, progress) * (0.85 + 0.25 * twinkle);
 
-          // Nở Bokeh khi tia bắn tràn về gần camera (Z > 50)
           float frontScale = clamp((pos.z - 50.0) / 450.0, 0.0, 1.0);
-          sizeGrowth *= (1.0 + frontScale * 0.85);
+          sizeGrowth *= (1.0 + frontScale * 0.7);
 
-          // Tăng nhẹ độ sáng ở vùng tâm
           float distNorm = length(pos.xz - uCenter.xz) / 1224.0;
           float coreGlow = 1.0 + 0.55 * exp(-pow(distNorm / 0.35, 2.0));
           vec3 starColor = customColor * coreGlow;
-
-          // Điểm xuyết hạt sáng lấp lánh mạnh (~2% mật độ)
-          if (sparkle > 0.5) {
-            float flash = pow(max(0.0, sin(uLoopAngle * sparkle * 2.0 + twinklePhase * 2.0)), 6.0);
-            sizeGrowth *= (1.0 + flash * 1.5);
-            alphaMult = min(1.0, alphaMult + flash * 0.4);
-            alphaNorm = min(1.0, alphaNorm + flash * 0.5);
-            starColor = mix(starColor, vec3(2.2, 2.2, 2.5), flash * 0.9);
-          }
 
           vColor = starColor;
           vAlpha = alphaMult * alphaNorm;
@@ -273,29 +390,113 @@ export const StageFloorThree: React.FC<StageFloorThreeProps> = ({
         void main() {
           vec4 texColor = texture2D(uPointTexture, gl_PointCoord);
           if (texColor.a < 0.01) discard;
-          gl_FragColor = vec4(vColor * texColor.rgb * 1.3, texColor.a * vAlpha);
+          gl_FragColor = vec4(vColor * texColor.rgb * 1.25, texColor.a * vAlpha);
         }
       `,
             transparent: true,
             blending: THREE.AdditiveBlending,
             depthWrite: false,
         });
-        materialRef.current = material;
+        dustMaterialRef.current = dustMaterial;
+        const dustPoints = new THREE.Points(dustGeometry, dustMaterial);
+        scene.add(dustPoints);
 
-        const points = new THREE.Points(geometry, material);
-        scene.add(points);
+        // 2. TẠO LAYER SAO TINH THỂ LẤP LÁNH 4 CÁNH (Star Flare Points - 10%)
+        const glintGeometry = new THREE.BufferGeometry();
+        glintGeometry.setAttribute('position', new THREE.BufferAttribute(glintPositions, 3));
+        glintGeometry.setAttribute('randomData', new THREE.BufferAttribute(glintRandomData, 4));
+        glintGeometry.setAttribute('customColor', new THREE.BufferAttribute(glintColors, 3));
+        glintGeometry.setAttribute('sparkle', new THREE.BufferAttribute(glintSparkles, 1));
+
+        const flareTexture = createFloorStarFlareSprite();
+        const glintMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                uLoopAngle: { value: 0 },
+                uPointTexture: { value: flareTexture },
+                uCenter: { value: new THREE.Vector3(0, -465, -80) },
+            },
+            vertexShader: `
+        uniform float uLoopAngle;
+        uniform vec3 uCenter;
+        attribute vec4 randomData;
+        attribute vec3 customColor;
+        attribute float sparkle;
+        varying vec3 vColor;
+        varying float vAlpha;
+
+        void main() {
+          float flowSpeed = randomData.x;
+          float flowPhase = randomData.y;
+          float baseSize = randomData.z;
+          float twinklePhase = randomData.w;
+
+          float progress = fract(flowPhase + uLoopAngle * flowSpeed / (6.28318530718));
+          float rNorm = sqrt(progress);
+
+          vec3 pos = mix(uCenter, position, rNorm);
+
+          float fadeCenter = smoothstep(0.0, 0.04, progress);
+          float fadeEdge = smoothstep(1.0, 0.85, progress);
+          float alphaMult = fadeCenter * fadeEdge;
+
+          // Hiệu ứng chớp lóe tia 4 cánh đa tần số chuẩn Seamless Loop 100%
+          float glintFreq = sparkle;
+          float wave = abs(sin(uLoopAngle * glintFreq + twinklePhase));
+          float flash = pow(wave, 5.0); // Đường cong chớp kim cương sắc nét
+
+          float sizeGrowth = 0.25 + flash * 3.2; // Khi nghỉ: hạt rất nhỏ, khi chớp: nở bung tia sao
+          float alphaNorm = 0.15 + flash * 2.8;
+
+          float frontScale = clamp((pos.z - 50.0) / 450.0, 0.0, 1.0);
+          sizeGrowth *= (1.0 + frontScale * 0.70);
+
+          // Ánh sáng kim cương trắng chói lóa khi đạt đỉnh lóe sáng
+          vec3 starColor = mix(customColor * 1.15, vec3(3.8, 3.8, 4.2), flash * 0.95);
+
+          vColor = starColor;
+          vAlpha = alphaMult * alphaNorm;
+
+          vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+          float calculatedSize = baseSize * sizeGrowth * (1350.0 / -mvPosition.z);
+          gl_PointSize = min(calculatedSize, 85.0); // Khóa trần 85px cho tia sao điện ảnh hoàn mỹ
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+            fragmentShader: `
+        uniform sampler2D uPointTexture;
+        varying vec3 vColor;
+        varying float vAlpha;
+
+        void main() {
+          vec4 texColor = texture2D(uPointTexture, gl_PointCoord);
+          if (texColor.a < 0.01) discard;
+          gl_FragColor = vec4(vColor * texColor.rgb * 1.35, texColor.a * vAlpha);
+        }
+      `,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+        });
+        glintMaterialRef.current = glintMaterial;
+        const glintPoints = new THREE.Points(glintGeometry, glintMaterial);
+        scene.add(glintPoints);
 
         return () => {
             renderer.forceContextLoss();
             renderer.dispose();
-            geometry.dispose();
-            material.dispose();
+            dustGeometry.dispose();
+            dustMaterial.dispose();
+            glintGeometry.dispose();
+            glintMaterial.dispose();
         };
-    }, [width, height, positions, randomData, colors, sparkles]);
+    }, [width, height, dustPositions, dustRandomData, dustColors, glintPositions, glintRandomData, glintColors, glintSparkles]);
 
     useEffect(() => {
-        if (materialRef.current) {
-            materialRef.current.uniforms.uLoopAngle.value = loopAngle;
+        if (dustMaterialRef.current) {
+            dustMaterialRef.current.uniforms.uLoopAngle.value = loopAngle;
+        }
+        if (glintMaterialRef.current) {
+            glintMaterialRef.current.uniforms.uLoopAngle.value = loopAngle;
         }
         if (rendererRef.current && sceneRef.current && cameraRef.current) {
             rendererRef.current.render(sceneRef.current, cameraRef.current);
